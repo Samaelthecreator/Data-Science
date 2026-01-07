@@ -55,217 +55,211 @@ El camino desde los conceptos fundamentales hasta la complejidad de la IA modern
 
 ---
 
-## 5. Desarrollo de Métodos y Temas
+## 5. Naturaleza y Flujo de los Datos
 
-A continuación, se desarrollan los métodos clave con rigor matemático, respondiendo a su utilidad y ejemplos.
+Antes de aplicar cualquier algoritmo, es fundamental entender la materia prima: el dato. El objetivo final no es tener datos, sino tomar decisiones sabias.
 
-### A. Pruebas de Hipótesis (Hypothesis Testing)
+### 5.1 Del Dato a la Sabiduría (Jerarquía DIKW)
 
-**¿Qué resuelve?**
-Determina si existe evidencia suficiente en una muestra de datos para inferir que una cierta condición es verdadera para toda la población. Resuelve el problema de distinguir entre un efecto real y el azar.
+El flujo de trabajo en ciencia de datos sigue una transformación progresiva de valor:
 
-**¿Por qué es importante?**
-Es la base del método científico cuantitativo. Sin ella, no podríamos validar si un nuevo medicamento funciona o si un cambio en una estrategia de marketing realmente aumentó las ventas.
+1.  **Datos (Data):** Símbolos brutos, hechos o señales sin contexto. 
+    *   *Ejemplo:* "38", "Rojo", "10:00 AM".
+2.  **Información (Information):** Datos procesados, estructurados y puestos en contexto para que tengan significado. Responde a "¿Quién?", "¿Qué?", "¿Dónde?".
+    *   *Ejemplo:* "La temperatura del paciente a las 10:00 AM fue de 38 grados y tiene la garganta roja".
+3.  **Conocimiento (Knowledge):** Información organizada, sintetizada e internalizada que permite comprender relaciones y patrones. Responde a "¿Cómo?".
+    *   *Ejemplo:* "Una temperatura de 38 grados con garganta roja suele indicar una infección bacteriana o viral".
+4.  **Sabiduría (Wisdom):** Conocimiento aplicado para la toma de decisiones y la predicción, incorporando juicio ético y pragmático. Responde a "¿Por qué?" y "¿Qué debemos hacer?".
+    *   *Ejemplo:* "Dado el historial de alergias del paciente, no recetaremos penicilina y monitorearemos la fiebre 24 horas antes de intervenir".
 
-**Definición Técnica:**
-Sea $H_0$ la hipótesis nula (ej. "no hay efecto") y $H_1$ la hipótesis alternativa. Un test de hipótesis busca calcular un estadístico de prueba $T$ a partir de los datos $X$ y determinar la probabilidad de observar $T$ bajo el supuesto de que $H_0$ es cierta (p-valor).
-Formalmente, definimos una región crítica $C_\alpha$ tal que:
-$$ P(T \in C_\alpha | H_0) = \alpha $$
-Donde $\alpha$ es el nivel de significancia (error Tipo I). Rechazamos $H_0$ si el estadístico observado $t \in C_\alpha$.
+### 5.2 Estructuración y Manipulación de Datos
 
-**Ejemplos:**
-*   **Cotidiano:** Determinar si una moneda está trucada. Lanzamos la moneda 100 veces; si salen 90 caras ($H_0$: probabilidad=0.5), la probabilidad de que esto ocurra por azar es infinitesimal, por lo que concluimos que está trucada.
-*   **Científico:** Un ensayo clínico para un nuevo fármaco oncológico. Se compara la tasa de supervivencia del grupo de control ($H_0$) vs el grupo experimental. Si la diferencia es estadísticamente significativa (p < 0.05), se aprueba el fármaco.
+Para que un algoritmo matemático pueda "digerir" la realidad, esta debe abstraerse en una estructura numérica.
 
----
+*   **Datos Estructurados:** Información altamente organizada, fácilmente buscable en bases de datos relacionales (SQL).
+    *   *Forma:* Tablas (filas y columnas).
+    *   *Manipulación:* Dataframes (Pandas/R), Álgebra Relacional.
+    *   *Ejemplo:* Una hoja de Excel con ventas por mes.
+*   **Datos No Estructurados:** Información sin un modelo predefinido. Representan la mayoría de los datos modernos (80%+).
+    *   *Forma:* Texto libre, imágenes (matrices de píxeles), audio (ondas), video.
+    *   *Manipulación:* Requieren preprocesamiento complejo para convertirse en tensores.
+        *   **Tensores:** Generalización de matrices a n-dimensiones. Una imagen a color es un tensor de (Alto x Ancho x 3 canales RGB).
+        *   **Embeddings:** Convertir palabras o entidades en vectores numéricos densos que capturan su significado semántico.
 
-### B. Regresión Lineal (Linear Regression)
+**¿Qué pasa cuando no hay estructura?**
+Cuando los datos son caóticos (ej. logs de servidor mezclados, tweets con emojis), se aplica **Ingeniería de Características (Feature Engineering)** y **ETL (Extract, Transform, Load)** para imponer una estructura o extraer señales interpretables. Si esto no es posible, se utilizan modelos de Deep Learning que pueden aprender directamente de datos crudos ("End-to-End Learning"), aunque a un costo computacional mayor.
 
-**¿Qué resuelve?**
-Modela la relación entre una variable dependiente continua $y$ y una o más variables independientes $X$. Predice el valor de $y$ basándose en $X$.
+### 5.3 La Importancia de la Estructura en el Modelado
 
-**¿Por qué es importante?**
-Permite cuantificar el impacto de variables (ej. precio, temperatura) sobre un resultado y hacer predicciones numéricas precisas. Es simple, interpretable y fundamento de métodos más complejos.
-
-**Definición Técnica:**
-Dado un conjunto de datos $\{ (x_i, y_i) \}_{i=1}^n$, asumimos una relación lineal:
-$$ y_i = \beta_0 + \beta_1 x_{i1} + \dots + \beta_p x_{ip} + \epsilon_i $$
-O en notación matricial: $Y = X\beta + \epsilon$.
-El objetivo es encontrar el vector de coeficientes $\hat{\beta}$ que minimice la Suma de los Errores Cuadráticos (SSE):
-$$ J(\beta) = \sum_{i=1}^{n} (y_i - x_i^T \beta)^2 = ||Y - X\beta||^2 $$
-La solución analítica (Estimador de Mínimos Cuadrados Ordinarios) es:
-$$ \hat{\beta} = (X^T X)^{-1} X^T Y $$
-
-**Ejemplos:**
-*   **Cotidiano:** Predecir el precio de una casa basándose en sus metros cuadrados y número de habitaciones.
-*   **Científico:** Estimar la tasa de expansión del universo (Constante de Hubble) analizando la relación lineal entre la distancia de las galaxias y su velocidad de recesión.
+El esquema de datos dicta el método. Un algoritmo de regresión lineal espera un vector de números (estructura fija). Si le das texto, fallará. Gran parte del trabajo del científico de datos es convertir el mundo real en esa estructura matricial ($X$) que los métodos matemáticos exigen. Sin una estructura de datos limpia y representativa, el modelo más avanzado solo producirá ruido ("Garbage In, Garbage Out").
 
 ---
 
-### C. Regresión Logística (Logistic Regression)
+## 6. Desarrollo de Métodos y Temas
+
+A continuación, se presentan los métodos fundamentales agrupados por su paradigma de aprendizaje.
+
+### 6.1 Inferencia Estadística
+
+Antes del Machine Learning, la inferencia estadística nos permite sacar conclusiones sobre una población total observando solo una pequeña muestra.
+
+#### A. Pruebas de Hipótesis (Hypothesis Testing)
 
 **¿Qué resuelve?**
-Clasifica datos en categorías discretas (generalmente binarias: sí/no, 0/1). A diferencia de la regresión lineal, predice la *probabilidad* de pertenencia a una clase.
+Determina si existe evidencia suficiente en una muestra para inferir que una condición es verdadera para toda la población, distinguiendo efectos reales del azar.
 
 **¿Por qué es importante?**
-Es fundamental para problemas de clasificación donde necesitamos certeza probabilística, como diagnósticos médicos o detección de fraude.
+Es la base del método científico. Valida si un medicamento funciona o si una estrategia de ventas surtió efecto.
 
 **Definición Técnica:**
-Modelamos la probabilidad $P(Y=1|X)$ usando la función sigmoide (logística) $\sigma(z) = \frac{1}{1+e^{-z}}$, que mapea cualquier valor real al intervalo $(0,1)$.
-$$ P(Y=1|X) = \frac{1}{1 + e^{-(\beta_0 + \beta^T X)}} $$
-Para ajustar los parámetros $\beta$, no minimizamos el error cuadrático, sino que maximizamos la Verosimilitud (Likelihood) o minimizamos la entropía cruzada (Cross-Entropy Loss):
-$$ J(\beta) = -\sum_{i=1}^n [y_i \log(\hat{y}_i) + (1-y_i) \log(1-\hat{y}_i)] $$
+Un test calcula la probabilidad (p-valor) de observar un estadístico $T$ bajo el supuesto de una hipótesis nula $H_0$. Si $P(T|H_0) < \alpha$, rechazamos $H_0$.
+
+**Definición Simple (Secundaria):**
+Imagina que eres un juez. La "Hipótesis Nula" es que el acusado es inocente. Las "pruebas" son los datos. Si las pruebas son muy contundentes (la probabilidad de que sea inocente con esas pruebas es bajísima, casi cero), entonces dictas sentencia de "culpable". Si las pruebas son débiles, mantienes la inocencia. No pruebas que es inocente, solo que no hay pruebas suficientes para condenarlo.
 
 **Ejemplos:**
-*   **Cotidiano:** El filtro de spam de tu correo electrónico. Determina la probabilidad de que un email sea "Spam" o "No Spam" basándose en palabras clave.
-*   **Científico:** Determinar si un paciente tiene una enfermedad coronaria (Sí/No) basándose en niveles de colesterol, presión arterial y edad.
+*   **Cotidiano:** ¿La moneda está trucada? Si lanzo 100 veces y salen 99 caras, es casi imposible que sea suerte.
+*   **Científico:** Comparar si la vacuna A es más efectiva que la vacuna B en un ensayo clínico.
 
 ---
 
-### D. K-Means Clustering (Agrupamiento)
+### 6.2 Aprendizaje Supervisado
+
+En este tipo de aprendizaje, "enseñamos" a la computadora con ejemplos. Le damos los datos de entrada ($X$) y la respuesta correcta ($Y$). El objetivo es que la máquina aprenda la relación para predecir $Y$ en datos nuevos.
+
+**(Si la respuesta $Y$ es un número, se llama Regresión. Si es una categoría, Clasificación).**
+
+#### B. Regresión Lineal (Linear Regression)
 
 **¿Qué resuelve?**
-Agrupa un conjunto de datos en $k$ grupos (clusters) distintos basándose en su similitud, sin conocer a priori las etiquetas de los datos (Aprendizaje No Supervisado).
+Predice un valor numérico continuo basándose en otras variables relacionadas.
 
 **¿Por qué es importante?**
-Permite descubrir estructuras ocultas en los datos, segmentar poblaciones y organizar información no etiquetada.
+Permite estimar cantidades futuras (ventas, precios) de forma simple e interpretable.
 
 **Definición Técnica:**
-Dado un conjunto de datos $\{x_1, \dots, x_n\}$, queremos dividirlo en $k$ conjuntos $S = \{S_1, \dots, S_k\}$ para minimizar la suma de cuadrados dentro del cluster (WCSS):
-$$ \arg \min_S \sum_{i=1}^{k} \sum_{x \in S_i} ||x - \mu_i||^2 $$
-Donde $\mu_i$ es la media (centroide) de los puntos en $S_i$. El algoritmo itera entre dos pasos:
-1.  **Asignación:** Asignar cada punto al centroide $\mu_i$ más cercano (Distancia Euclidiana).
-2.  **Actualización:** Recalcular $\mu_i$ como el promedio de los puntos asignados a su cluster.
+Minimiza el error cuadrático medio entre los datos observados y una función lineal: $\hat{y} = \beta_0 + \beta_1 x$. Se optimiza encontrando $\beta$ tal que $\nabla ||Y - X\beta||^2 = 0$.
+
+**Definición Simple (Secundaria):**
+Tienes una hoja de papel con muchos puntos dispersos. Tu tarea es usar una regla y un lápiz para dibujar una sola línea recta que pase lo más cerca posible de todos los puntos al mismo tiempo. Esa línea te permite "adivinar" dónde caerán futuros puntos.
 
 **Ejemplos:**
-*   **Cotidiano:** Segmentación de clientes de un supermercado para campañas de marketing (ej. "compradores impulsivos", "familias ahorradoras").
-*   **Científico:** Clasificación taxonómica de nuevas especies de plantas basándose en características fenotípicas (tamaño de hoja, altura) sin conocer su especie previamente.
+*   **Cotidiano:** Predecir cuánto costará una casa según su tamaño.
+*   **Científico:** Estimar la expansión del universo midiendo la distancia y velocidad de galaxias.
+
+#### C. Regresión Logística (Logistic Regression)
+
+**¿Qué resuelve?**
+Clasifica datos en dos opciones (Sí/No, 0/1) calculando la *probabilidad* de que pertenezcan a una de ellas.
+
+**¿Por qué es importante?**
+Fundamental para toma de decisiones binarias con incertidumbre (riesgo de crédito, diagnósticos).
+
+**Definición Técnica:**
+Modela la probabilidad $P(Y=1|X)$ usando la función sigmoide $\sigma(z) = \frac{1}{1+e^{-z}}$, ajustando parámetros por Máxima Verosimilitud.
+
+**Definición Simple (Secundaria):**
+Imagina que quieres separar manzanas rojas de manzanas verdes en una mesa. La regresión logística es como poner una vara (frontera) en la mesa. Todo lo que esté a un lado de la vara se etiqueta como "Posiblemente Rojo" y al otro como "Posiblemente Verde". Además, te dice qué tan seguro está (ej: "Estoy 90% seguro de que esto es rojo").
+
+**Ejemplos:**
+*   **Cotidiano:** Filtro de SPAM (¿Es correo basura o no?).
+*   **Científico:** Predecir si un paciente tiene una enfermedad (Sí/No) según sus análisis.
+
+#### F. Redes Neuronales (Deep Learning - MLP)
+
+**¿Qué resuelve?**
+Aprende patrones extremadamente complejos y no lineales (caras, voces, traducción).
+
+**¿Por qué es importante?**
+Permite a las computadoras "ver" y "escuchar", resolviendo problemas que no tienen reglas matemáticas simples.
+
+**Definición Técnica:**
+Composición de funciones no lineales en capas. $f(x) = \sigma(W_2 \sigma(W_1 x))$. Se entrena vía Backpropagation del gradiente del error.
+
+**Definición Simple (Secundaria):**
+Es como un equipo de personas pasándose un mensaje. La primera fila ve una foto y pasa detalles simples ("hay una línea curva") a la segunda fila. La segunda fila combina eso ("parece un ojo"). La tercera fila combina más ("es una cara"). Al final, deciden juntos qué hay en la foto. Aprenden corrigiéndose unos a otros cuando se equivocan.
+
+**Ejemplos:**
+*   **Cotidiano:** Desbloqueo facial de tu celular.
+*   **Científico:** Detectar patrones genéticos ocultos en el ADN.
 
 ---
 
-### E. Análisis de Componentes Principales (PCA)
+### 6.3 Aprendizaje No Supervisado
+
+Aquí, la computadora trabaja sola, sin maestro. Le damos datos ($X$) pero *no* le damos respuestas ($Y$). Su tarea es encontrar estructuras, grupos o patrones ocultos por sí misma.
+
+#### D. K-Means Clustering (Agrupamiento)
 
 **¿Qué resuelve?**
-Reduce la dimensionalidad de un conjunto de datos, transformando muchas variables correlacionadas en un número menor de variables no correlacionadas (componentes principales), conservando la mayor cantidad de varianza (información) posible.
+Agrupa objetos similares en "clusters" o montones, sin saber qué son esos objetos de antemano.
 
 **¿Por qué es importante?**
-Permite visualizar datos complejos, eliminar ruido y mejorar la eficiencia de otros algoritmos al reducir el número de variables a procesar (maldición de la dimensionalidad).
+Ayuda a descubrir segmentos naturales en datos caóticos (clientes, especies biológicas).
 
 **Definición Técnica:**
-PCA busca una transformación ortogonal tal que el primer componente principal tenga la mayor varianza posible. Matemáticamente, se basa en la descomposición en valores propios (eigendecomposition) de la matriz de covarianza $\Sigma$ de los datos centrados.
-Si $\Sigma = \frac{1}{n-1} X^T X$, buscamos los vectores propios $v$ y valores propios $\lambda$ tales que:
-$$ \Sigma v = \lambda v $$
-Los vectores propios correspondientes a los mayores valores propios $\lambda$ definen el nuevo subespacio donde se proyectarán los datos.
+Particiona datos en $k$ conjuntos minimizando la varianza intra-cluster (distancia euclidiana al centroide $\mu$). Algoritmo iterativo Expectation-Maximization.
+
+**Definición Simple (Secundaria):**
+Imagina que tienes una bolsa de canicas de muchos colores mezclados y te pido que las separes en 3 montones. No te digo qué colores buscar, solo que pongas las que se parecen juntas. Al final tendrás un montón de "rojizas", otro de "azuladas", etc., sin que yo te dijera cómo hacerlo.
 
 **Ejemplos:**
-*   **Cotidiano:** Compresión de imágenes. Reducir el tamaño de un archivo de imagen eliminando componentes que aportan poca información visual (varianza baja).
-*   **Científico:** Análisis de datos genómicos (Microarrays). Un estudio puede tener miles de genes (variables) pero pocas muestras. PCA reduce estos miles de genes a unos pocos "supergetes" que explican las diferencias biológicas principales.
+*   **Cotidiano:** Netflix creando grupos de usuarios con gustos similares ("Amantes de comedias").
+*   **Científico:** Clasificar nuevas especies de plantas por su forma sin saber sus nombres.
+
+#### E. Análisis de Componentes Principales (PCA)
+
+**¿Qué resuelve?**
+Simplifica datos complejos reduciendo su cantidad de variables, pero conservando la información importante.
+
+**¿Por qué es importante?**
+Permite visualizar datos de muchas dimensiones (imposibles de ver para humanos) y elimina el "ruido".
+
+**Definición Técnica:**
+Transformación ortogonal que proyecta datos a un nuevo sistema de coordenadas (componentes principales) donde la varianza se maximiza progresivamente. Utiliza valores propios de la matriz de covarianza.
+
+**Definición Simple (Secundaria):**
+Imagina la sombra de un objeto 3D (como una tetera) en la pared. El objeto es complejo, pero la sombra es plana (2D). Si giras la tetera hasta que la sombra muestre su forma más clara (donde se ve el mango y el pico), has hecho un PCA: has reducido un objeto 3D a una imagen 2D perdiendo la menor cantidad de detalle posible.
+
+**Ejemplos:**
+*   **Cotidiano:** Comprimir una imagen JPG (quitas datos pero la foto se ve casi igual).
+*   **Científico:** Analizar miles de genes y encontrar los 2 o 3 "super-genes" responsables de una enfermedad.
 
 ---
 
-### F. Redes Neuronales (Deep Learning - Perceptrón Multicapa)
-
-**¿Qué resuelve?**
-Modela relaciones extremadamente no lineales y complejas. Resuelve problemas que los algoritmos tradicionales no pueden, como reconocimiento de patrones en imágenes, audio y texto.
-
-**¿Por qué es importante?**
-Es la base de la IA moderna. Su capacidad de aprender representaciones jerárquicas de los datos ha revolucionado la tecnología (conducción autónoma, traducción automática).
-
-**Definición Técnica:**
-Un Perceptrón Multicapa (MLP) es una función compuesta $f(x) = f^{(L)}(\dots f^{(2)}(f^{(1)}(x)))$.
-Cada capa $l$ computa una transformación afín seguida de una función de activación no lineal $\sigma$ (como ReLU o Sigmoide):
-$$ h^{(l)} = \sigma(W^{(l)} h^{(l-1)} + b^{(l)}) $$
-Donde $W^{(l)}$ es la matriz de pesos y $b^{(l)}$ el vector de sesgo (bias).
-El aprendizaje se realiza mediante el algoritmo de **Backpropagation** (Regla de la Cadena), ajustando los pesos para minimizar una función de pérdida global:
-$$ \frac{\partial J}{\partial W^{(l)}} = \text{propagar el error desde la salida hacia atrás} $$
-
-**Ejemplos:**
-*   **Determinar:** Determinar si una persona pertenece a un grupo de Facebook (Sugerencia de amigos basada en grafos y comportamiento).
-*   **Científico:** Determinar si una secuencia de nucleótidos tiene un patrón específico (Promotores genéticos) mediante modelos de secuencia (RNNs o CNNs 1D).
-
----
-
-## 6. Ciencia de Datos Avanzada
+## 7. Ciencia de Datos Avanzada
 
 Esta sección aborda conceptos de frontera que modelan sistemas dinámicos, relacionales y no estructurados de alta complejidad.
 
-### G. Cálculo Estocástico (Stochastic Calculus)
+### G. Cálculo Estocástico
+*Modelar sistemas que cambian con el azar (mercados financieros, difusión).*
+*   **Concepto:** Ecuaciones diferenciales donde el "ruido" es parte de la ecuación ($dX_t = \mu dt + \sigma dW_t$).
 
-**¿Qué resuelve?**
-Proporciona un marco matemático para modelar sistemas que evolucionan a lo largo del tiempo con componentes aleatorios inherentes. Permite describir y predecir el comportamiento de variables inciertas de manera continua.
+### H. Teoría de Grafos
+*Analizar redes y conexiones.*
+*   **Concepto:** Usar matemáticas de redes (nodos y aristas) para encontrar influencers, comunidades o rutas óptimas.
 
-**¿Por qué es importante?**
-Es fundamental cuando el "ruido" no es un error, sino una parte intrínseca del sistema, como en mercados financieros o difusión de partículas. Nos permite definir ecuaciones diferenciales donde la variación es aleatoria.
-
-**Definición Técnica:**
-Se centra en el estudio de procesos estocásticos $\{X_t\}_{t \ge 0}$, como el Movimiento Browniano $W_t$. Una herramienta clave es la **Integral de Itô**, definida como el límite de sumas de Riemann-Stieltjes adaptadas:
-$$ \int_{0}^{t} H_s dW_s = \lim_{n \to \infty} \sum_{i=0}^{n-1} H_{t_i} (W_{t_{i+1}} - W_{t_i}) $$
-Esto permite resolver Ecuaciones Diferenciales Estocásticas (SDEs) de la forma $dX_t = \mu(X_t, t)dt + \sigma(X_t, t)dW_t$, donde $\mu$ es la deriva (drift) y $\sigma$ la volatilidad (difusión).
-
-**Ejemplos:**
-*   **Cotidiano:** Modelado de la volatilidad en precios de activos financieros (ej. acciones) para calcular el riesgo en portafolios de inversión o el precio de opciones.
-*   **Científico:** Modelar el movimiento aleatorio de partículas suspendidas en un fluido (difusión física) o la propagación de epidemias en poblaciones grandes bajo incertidumbre.
-
-### H. Teoría de Grafos y Clustering Espectral (Graph Theory)
-
-**¿Qué resuelve?**
-Analiza las relaciones y estructuras de interconexión entre entidades complejas. Permite encontrar patrones en datos donde "quién está conectado con quién" es más importante que las características individuales.
-
-**¿Por qué es importante?**
-Es esencial para entender redes sociales, infraestructuras, cadenas de suministro y sistemas biológicos. Permite descubrir "comunidades" o grupos naturales que no son detectables por algoritmos basados en distancia geométrica como K-Means.
-
-**Definición Técnica:**
-Un grafo $G = (V, E)$ consta de vértices $V$ y aristas $E$. Definimos la **Matriz de Adyacencia** $A$ donde $A_{ij}$ representa la conexión entre $i$ y $j$, y la **Matriz de Grado** $D$ (diagonal) donde $D_{ii} = \sum_j A_{ij}$.
-El **Laplaciano del Grafo** se define como $L = D - A$.
-El *Spectral Clustering* utiliza los vectores propios (eigenvectores) asociados a los valores propios más pequeños de $L$ para proyectar los datos en un espacio donde los clusters son fácilmente separables. Minimiza la "energía de corte" (Cut Energy) del grafo.
-
-**Ejemplos:**
-*   **Cotidiano:** Algoritmos de recomendación ("Personas que quizá conozcas") en redes sociales, basados en la estructura de tus conexiones actuales.
-*   **Científico:** Análisis de interacciones proteína-proteína para predecir funciones biológicas desconocidas basándose en la "vecindad" de la proteína en la red metabólica.
-
-### I. Modelado de Datos No Relacionales (NoSQL Modeling)
-
-**¿Qué resuelve?**
-Resuelve el problema de almacenar, procesar y consultar datos que no tienen una estructura fija (schema-less), son masivos o requieren escalabilidad horizontal extrema, algo que limita al modelo relacional tradicional.
-
-**¿Por qué es importante?**
-La mayoría de los datos modernos (logs, clicks, redes sociales, IoT) son desestructurados. El modelado NoSQL permite optimizar las consultas específicas y manejar la variabilidad del dato sin alterar esquemas rígidos (Teorema CAP).
-
-**Definición Técnica:**
-A diferencia del álgebra relacional, el modelado NoSQL se basa a menudo en **Teoria de Conjuntos** y estructuras de **Árboles/Grafos** JSON/BSON.
-Por ejemplo, en bases de datos de documentos, modelamos una entidad como un subconjunto de pares clave-valor denormalizados para optimizar la localidad de acceso:
-$$ \text{Doc}_i = \{ (k_1: v_1), (k_2: \{ \text{sub-doc} \}), \dots \} $$
-Matemáticamente, priorizamos la Disponibilidad y Tolerancia a Particiones (AP) sobre la Consistencia inmediata (C) en sistemas distribuidos, modelando datos como agregados autosuficientes en lugar de tablas normalizadas interdependientes.
-
-**Ejemplos:**
-*   **Cotidiano:** Tu perfil de usuario en una app de streaming, que guarda configuraciones, historial y preferencias en un solo objeto JSON complejo para una carga instantánea.
-*   **Científico:** Almacenamiento de lecturas crudas de sensores IoT en tiempo real donde la estructura del dato puede cambiar si se actualiza el firmware del sensor, sin romper la base de datos histórica.
+### I. Modelado NoSQL
+*Manejo de datos masivos y flexibles.*
+*   **Concepto:** Bases de datos que no usan tablas rígidas, sino documentos o grafos para escalar globalmente (Teorema CAP).
 
 ---
 
-## 7. Herramientas de Aplicación
+## 8. Herramientas de Aplicación
 
-Aunque la teoría es fundamental, estas herramientas permiten aplicar los conceptos matemáticos:
-
-*   **R:** Especializado en estadística inferencial y econometría.
-*   **Python (NumPy, Pandas, Scikit-learn):** El estándar de facto para Machine Learning general y Deep Learning.
-*   **MATLAB:** Muy usado en ingeniería y procesamiento de señales.
-*   **Julia:** Lenguaje de alto rendimiento para cálculo científico numérico.
-*   **SQL:** Fundamental para la extracción y manipulación de datos en bases de datos.
-*   **Neo4j / Gephi:** Para análisis y visualización de grafos.
-*   **MongoDB / Cassandra:** Para bases de datos NoSQL documentales y de columnas anchas.
+*   **Python:** El lenguaje principal (Librerías: Pandas, Scikit-Learn).
+*   **R:** Potente para estadística pura.
+*   **SQL:** El idioma de las bases de datos.
+*   **TensorFlow/PyTorch:** Para Inteligencia Artificial avanzada.
 
 ---
 
-## 8. Referencias Bibliográficas Serias
+## 9. Referencias Bibliográficas Serias
 
-Para profundizar con el rigor académico adecuado, se recomienda la siguiente bibliografía:
-
-1.  **Bishop, C. M. (2006).** *Pattern Recognition and Machine Learning*. Springer. (Referencia estándar para el enfoque probabilístico bayesiano).
-2.  **Hastie, T., Tibshirani, R., & Friedman, J. (2009).** *The Elements of Statistical Learning: Data Mining, Inference, and Prediction*. Springer. (La "biblia" del aprendizaje estadístico).
-3.  **Goodfellow, I., Bengio, Y., & Courville, A. (2016).** *Deep Learning*. MIT Press. (Texto fundamental para redes neuronales modernas).
-4.  **Casella, G., & Berger, R. L. (2002).** *Statistical Inference*. Duxbury. (Rigor matemático para teoría de probabilidad e inferencia).
-5.  **Tukey, J. W. (1962).** *The Future of Data Analysis*. The Annals of Mathematical Statistics. (Documento histórico fundacional).
-6.  **Oksendal, B. (2003).** *Stochastic Differential Equations: An Introduction with Applications*. Springer. (Referencia clásica para cálculo estocástico).
-7.  **Newman, M. (2018).** *Networks*. Oxford University Press. (La referencia definitiva para ciencia de redes y teoría de grafos).
-8.  **Kleppmann, M. (2017).** *Designing Data-Intensive Applications*. O'Reilly. (Texto esencial para sistemas distribuidos y modelado de datos modernos).
+1.  **Bishop, C. M. (2006).** *Pattern Recognition and Machine Learning*. Springer.
+2.  **Hastie, T., et al. (2009).** *The Elements of Statistical Learning*. Springer.
+3.  **Goodfellow, I., et al. (2016).** *Deep Learning*. MIT Press.
+4.  **Casella, G., & Berger, R. L. (2002).** *Statistical Inference*. Duxbury.
+5.  **Tukey, J. W. (1962).** *The Future of Data Analysis*.
+6.  **Newman, M. (2018).** *Networks*.
+7.  **Kleppmann, M. (2017).** *Designing Data-Intensive Applications*.
