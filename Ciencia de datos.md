@@ -45,13 +45,10 @@ El camino desde los conceptos fundamentales hasta la complejidad de la IA modern
 
 1.  **Fundamentos Matemáticos:** Logica, Teoría de Conjuntos, Álgebra Lineal, Cálculo Diferencial.
 2.  **Estadística Descriptiva:** Medidas de tendencia central, dispersión y distribuciones.
-3.  **Probabilidad e Inferencia:** Teorema de Bayes, Pruebas de Hipótesis, Intervalos de Confianza.
-4.  **Modelado Predictivo (Aprendizaje Supervisado Clásico):** Regresión Lineal, Logística, Árboles de Decisión.
-5.  **Aprendizaje No Supervisado:** Clustering (K-Means), Reducción de Dimensionalidad (PCA).
-6.  **Machine Learning Avanzado:** Ensemble Methods (Random Forest, XGBoost), SVM (Support Vector Machines).
-7.  **Deep Learning (Redes Neuronales):** Perceptrones, CNNs (visión), RNNs/Transformers (lenguaje).
-8.  **Ciencia de Datos Avanzada:** Cálculo Estocástico, Teoría de Grafos, Modelado NoSQL.
-9.  **Ingeniería de Datos y Big Data:** Procesamiento distribuido, ML Ops.
+3.  **Probabilidad e Inferencia:** Teorema de Bayes, Pruebas de Hipótesis, Intervalos de Confianza, Teoremas Lasso/Post-Lasso.
+4.  **Modelado Predictivo (Aprendizaje Supervisado Clásico):** Regresiones (Lineal, Logística, Ridge, Lasso), SVM, KNN, Árboles (Random Forest, Boosting).
+5.  **Aprendizaje No Supervisado:** Clustering (K-Means, Jerárquico, GMM), Reducción de Dimensionalidad (PCA, LDA).
+6.  **Ciencia de Datos Avanzada:** Cálculo Estocástico, Teoría de Grafos, Modelado NoSQL, Inferencia Variacional.
 
 ---
 
@@ -87,179 +84,209 @@ Para que un algoritmo matemático pueda "digerir" la realidad, esta debe abstrae
         *   **Embeddings:** Convertir palabras o entidades en vectores numéricos densos que capturan su significado semántico.
 
 **¿Qué pasa cuando no hay estructura?**
-Cuando los datos son caóticos (ej. logs de servidor mezclados, tweets con emojis), se aplica **Ingeniería de Características (Feature Engineering)** y **ETL (Extract, Transform, Load)** para imponer una estructura o extraer señales interpretables. Si esto no es posible, se utilizan modelos de Deep Learning que pueden aprender directamente de datos crudos ("End-to-End Learning"), aunque a un costo computacional mayor.
-
-### 5.3 La Importancia de la Estructura en el Modelado
-
-El esquema de datos dicta el método. Un algoritmo de regresión lineal espera un vector de números (estructura fija). Si le das texto, fallará. Gran parte del trabajo del científico de datos es convertir el mundo real en esa estructura matricial ($X$) que los métodos matemáticos exigen. Sin una estructura de datos limpia y representativa, el modelo más avanzado solo producirá ruido ("Garbage In, Garbage Out").
+Cuando los datos son caóticos, se aplica **Ingeniería de Características (Feature Engineering)** y **ETL (Extract, Transform, Load)** para imponer una estructura o extraer señales interpretables. Si esto no es posible, se utilizan modelos de Deep Learning que pueden aprender directamente de datos crudos ("End-to-End Learning"), aunque a un costo computacional mayor.
 
 ---
 
 ## 6. Desarrollo de Métodos y Temas
 
-A continuación, se presentan los métodos fundamentales agrupados por su paradigma de aprendizaje.
+A continuación, se presentan los métodos fundamentales agrupados por su paradigma de aprendizaje y función.
 
-### 6.1 Inferencia Estadística
+### 6.1 Inferencia Estadística y Validación
 
-Antes del Machine Learning, la inferencia estadística nos permite sacar conclusiones sobre una población total observando solo una pequeña muestra.
-
-#### A. Pruebas de Hipótesis (Hypothesis Testing)
+#### A. Pruebas de Hipótesis y Valor P (P-Value)
 
 **¿Qué resuelve?**
-Determina si existe evidencia suficiente en una muestra para inferir que una condición es verdadera para toda la población, distinguiendo efectos reales del azar.
-
-**¿Por qué es importante?**
-Es la base del método científico. Valida si un medicamento funciona o si una estrategia de ventas surtió efecto.
+Determina si existe evidencia estadística suficiente para rechazar una conjetura sobre una población, cuantificando la probabilidad de que los resultados sean producto del azar.
 
 **Definición Técnica:**
-Un test calcula la probabilidad (p-valor) de observar un estadístico $T$ bajo el supuesto de una hipótesis nula $H_0$. Si $P(T|H_0) < \alpha$, rechazamos $H_0$.
+Dado un estadístico de prueba $T$ y una hipótesis nula $H_0$, el valor P es la probabilidad de observar un valor tan extremo como $T$ asumiendo que $H_0$ es cierta: $\text{P-valor} = P(T \ge t_{obs} | H_0)$. Si P-valor < $\alpha$ (nivel de significancia), rechazamos $H_0$.
 
-**Definición Simple (Secundaria):**
-Imagina que eres un juez. La "Hipótesis Nula" es que el acusado es inocente. Las "pruebas" son los datos. Si las pruebas son muy contundentes (la probabilidad de que sea inocente con esas pruebas es bajísima, casi cero), entonces dictas sentencia de "culpable". Si las pruebas son débiles, mantienes la inocencia. No pruebas que es inocente, solo que no hay pruebas suficientes para condenarlo.
+**Definición Simple:**
+Imagina un juicio. La hipótesis nula es "Inocente". El valor P es la probabilidad de que las pruebas en su contra hayan aparecido por pura casualidad. Si esa probabilidad es minúscula (ej. 0.001%), entonces es "demasiada casualidad" y decides que es culpable.
 
 **Ejemplos:**
-*   **Cotidiano:** ¿La moneda está trucada? Si lanzo 100 veces y salen 99 caras, es casi imposible que sea suerte.
-*   **Científico:** Comparar si la vacuna A es más efectiva que la vacuna B en un ensayo clínico.
+*   **Cotidiano:** ¿Ese dado está cargado? Si sacas '6' veinte veces seguidas, el valor P es bajísimo; por tanto, el dado está cargado.
+*   **Científico:** Comparar efectividad de fármacos usando intervalos de confianza (IC).
+
+#### B. Métodos de Verosimilitud (Likelihood)
+
+**¿Qué resuelve?**
+Estima los parámetros de un modelo probabilístico que "mejor explican" los datos observados.
+
+**Definición Técnica:**
+Dada una función de densidad de probabilidad $f(x|\theta)$, la función de verosimilitud es $L(\theta|x) = f(x|\theta)$. El Estimador de Máxima Verosimilitud (MLE) busca $\hat{\theta} = \arg\max_\theta L(\theta|x)$.
+
+**Definición Simple:**
+Si encuentras una huella de zapato talla 45 en el barro (datos). La verosimilitud te ayuda a calcular cuál de tus sospechosos (parámetros) es el más probable dueño del zapato. Maximizas esa probabilidad para encontrar al culpable.
 
 ---
 
-### 6.2 Aprendizaje Supervisado
+### 6.2 Aprendizaje Supervisado: Regresión y Clasificación
 
-En este tipo de aprendizaje, "enseñamos" a la computadora con ejemplos. Le damos los datos de entrada ($X$) y la respuesta correcta ($Y$). El objetivo es que la máquina aprenda la relación para predecir $Y$ en datos nuevos.
+En este tipo de aprendizaje, entrenamos un modelo $f(X) \to Y$ usando pares de datos etiquetados.
 
-**(Si la respuesta $Y$ es un número, se llama Regresión. Si es una categoría, Clasificación).**
-
-#### B. Regresión Lineal (Linear Regression)
+#### C. Regresiones Avanzadas (Ridge, Lasso, Elastic Net)
 
 **¿Qué resuelve?**
-Predice un valor numérico continuo basándose en otras variables relacionadas.
-
-**¿Por qué es importante?**
-Permite estimar cantidades futuras (ventas, precios) de forma simple e interpretable.
+Mejora la regresión lineal tradicional cuando hay muchas variables o correlación entre ellas (multicolinealidad), evitando el sobreajuste (overfitting).
 
 **Definición Técnica:**
-Minimiza el error cuadrático medio entre los datos observados y una función lineal: $\hat{y} = \beta_0 + \beta_1 x$. Se optimiza encontrando $\beta$ tal que $\nabla ||Y - X\beta||^2 = 0$.
+Añaden un término de penalización (regularización) a la función de pérdida original $J(\theta)$:
+*   **Ridge (L2):** Minimiza $SSE + \lambda \sum \beta_j^2$. (Contrae coeficientes hacia cero, pero no los elimina).
+*   **Lasso (L1):** Minimiza $SSE + \lambda \sum |\beta_j|$. (Puede hacer coeficientes exactamente cero, actuando como selector de variables).
+*   **Elastic Net:** Combina L1 y L2: $SSE + \lambda_1 \sum |\beta_j| + \lambda_2 \sum \beta_j^2$.
 
-**Definición Simple (Secundaria):**
-Tienes una hoja de papel con muchos puntos dispersos. Tu tarea es usar una regla y un lápiz para dibujar una sola línea recta que pase lo más cerca posible de todos los puntos al mismo tiempo. Esa línea te permite "adivinar" dónde caerán futuros puntos.
+**Definición Simple:**
+Imagina que intentas explicar el éxito con 100 razones. La regresión normal intentará usarlas todas y se confundirá.
+*   Ridge: "Usa todas las razones, pero dales menos importancia a cada una para no exagerar".
+*   Lasso: "Elige solo las 3 razones más importantes e ignora el resto".
 
 **Ejemplos:**
-*   **Cotidiano:** Predecir cuánto costará una casa según su tamaño.
-*   **Científico:** Estimar la expansión del universo midiendo la distancia y velocidad de galaxias.
+*   **Cotidiano:** Predecir precios de casas usando 500 características (color de pared, tipo de grifo...). Lasso seleccionará solo las cruciales (metros, zona).
+*   **Científico:** GWAS (Estudios de asociación del genoma completo) donde hay millones de variantes genéticas y solo pocas causan la enfermedad.
 
-#### C. Regresión Logística (Logistic Regression)
+#### D. Clasificación: Máquinas de Soporte Vectorial (SVM)
 
 **¿Qué resuelve?**
-Clasifica datos en dos opciones (Sí/No, 0/1) calculando la *probabilidad* de que pertenezcan a una de ellas.
-
-**¿Por qué es importante?**
-Fundamental para toma de decisiones binarias con incertidumbre (riesgo de crédito, diagnósticos).
+Encuentra la mejor frontera (hiperplano) que separa dos clases de datos con el máximo margen posible.
 
 **Definición Técnica:**
-Modela la probabilidad $P(Y=1|X)$ usando la función sigmoide $\sigma(z) = \frac{1}{1+e^{-z}}$, ajustando parámetros por Máxima Verosimilitud.
+Busca maximizar el margen $\frac{2}{||w||}$ entre el hiperplano $w^T x + b = 0$ y los puntos de datos más cercanos (vectores de soporte). Se resuelve como un problema de optimización convexa cuadrática. Para datos no separables linealmente, usa el "Kernel Trick" mapeando datos a una dimensión superior $K(x_i, x_j) = \phi(x_i)^T \phi(x_j)$.
+*   *Soft-margin:* Permite algunos errores (violaciones del margen) controlados por un parámetro de penalización $C$.
 
-**Definición Simple (Secundaria):**
-Imagina que quieres separar manzanas rojas de manzanas verdes en una mesa. La regresión logística es como poner una vara (frontera) en la mesa. Todo lo que esté a un lado de la vara se etiqueta como "Posiblemente Rojo" y al otro como "Posiblemente Verde". Además, te dice qué tan seguro está (ej: "Estoy 90% seguro de que esto es rojo").
+**Definición Simple:**
+Es como construir una carretera entre dos pueblos (grupos de datos). Quieres que la carretera sea lo más ancha posible para que estén bien separados. Los "vectores de soporte" son las casas más cercanas a la carretera que definen su anchura. Si no puedes trazar una recta, elevas los pueblos en el aire (Kernel) hasta que puedas pasar una plancha plana entre ellos.
 
-**Ejemplos:**
-*   **Cotidiano:** Filtro de SPAM (¿Es correo basura o no?).
-*   **Científico:** Predecir si un paciente tiene una enfermedad (Sí/No) según sus análisis.
-
-#### F. Redes Neuronales (Deep Learning - MLP)
+#### E. Árboles de Decisión y Métodos de Ensamble
 
 **¿Qué resuelve?**
-Aprende patrones extremadamente complejos y no lineales (caras, voces, traducción).
+Modelos no lineales que dividen el espacio de datos en regiones rectangulares simples mediante reglas de decisión secuenciales.
 
-**¿Por qué es importante?**
-Permite a las computadoras "ver" y "escuchar", resolviendo problemas que no tienen reglas matemáticas simples.
+*   **Árbol de Decisión:** Divide los datos recursivamente preguntando reglas tipo "SI/NO" para maximizar la pureza (Gini/Entropía) de los nodos hijos.
+*   **Random Forest (Bagging):** Crea muchos árboles distintos entrenados con subconjuntos aleatorios de datos y promedia sus resultados (Agregación Bootstrap) para reducir varianza.
+*   **Boosting (Gradient Boosting/XGBoost):** Entrena árboles secuencialmente, donde cada nuevo árbol corrige los errores del anterior.
 
-**Definición Técnica:**
-Composición de funciones no lineales en capas. $f(x) = \sigma(W_2 \sigma(W_1 x))$. Se entrena vía Backpropagation del gradiente del error.
-
-**Definición Simple (Secundaria):**
-Es como un equipo de personas pasándose un mensaje. La primera fila ve una foto y pasa detalles simples ("hay una línea curva") a la segunda fila. La segunda fila combina eso ("parece un ojo"). La tercera fila combina más ("es una cara"). Al final, deciden juntos qué hay en la foto. Aprenden corrigiéndose unos a otros cuando se equivocan.
+**Definición Simple:**
+*   *Árbol:* Juego de "Adivina quién". ¿Es hombre? Sí. ¿Tiene gafas? No.
+*   *Random Forest:* Preguntar a 100 expertos diferentes y votar por la respuesta más común (Sabiduría de las masas).
+*   *Boosting:* Un estudiante hace un examen, ve qué falló, y estudia específicamente esos temas para el siguiente. Así mejora paso a paso.
 
 **Ejemplos:**
-*   **Cotidiano:** Desbloqueo facial de tu celular.
-*   **Científico:** Detectar patrones genéticos ocultos en el ADN.
+*   **Cotidiano:** El banco decidiendo si darte un crédito (¿Tienes trabajo? -> Sí. ¿Ganas más de X? -> Sí...).
+*   **Científico:** Clasificación de partículas en el Gran Colisionador de Hadrones (CERN) usando XGBoost.
+
+#### F. K-Vecinos Más Cercanos (K-NN)
+
+**¿Qué resuelve?**
+Algoritmo simple ("lazy learning") que clasifica un punto nuevo basándose en la mayoría de sus vecinos.
+
+**Definición Técnica:**
+Dado un punto $x_q$, encuentra los $k$ puntos $x_i$ más cercanos en distancia (Euclidiana, Manhattan) y asigna la etiqueta más frecuente (moda) o el promedio (regresión).
+
+**Definición Simple:**
+"Dime con quién andas y te diré quién eres". Si tus 5 vecinos más cercanos votan por el Partido A, probablemente tú también.
 
 ---
 
-### 6.3 Aprendizaje No Supervisado
+### 6.3 Aprendizaje No Supervisado: Clustering y Reducción
 
-Aquí, la computadora trabaja sola, sin maestro. Le damos datos ($X$) pero *no* le damos respuestas ($Y$). Su tarea es encontrar estructuras, grupos o patrones ocultos por sí misma.
-
-#### D. K-Means Clustering (Agrupamiento)
+#### G. K-Means (Algoritmo de Lloyd)
 
 **¿Qué resuelve?**
-Agrupa objetos similares en "clusters" o montones, sin saber qué son esos objetos de antemano.
-
-**¿Por qué es importante?**
-Ayuda a descubrir segmentos naturales en datos caóticos (clientes, especies biológicas).
+Particiona datos en $k$ clusters minimizando la distancia intracluster.
 
 **Definición Técnica:**
-Particiona datos en $k$ conjuntos minimizando la varianza intra-cluster (distancia euclidiana al centroide $\mu$). Algoritmo iterativo Expectation-Maximization.
+Itera dos pasos hasta converger: 1) Asignación: Cada punto va al centroide más cercano. 2) Actualización: Se recalcula el centroide como el promedio de los puntos asignados. (Minimiza Varianza).
 
-**Definición Simple (Secundaria):**
-Imagina que tienes una bolsa de canicas de muchos colores mezclados y te pido que las separes en 3 montones. No te digo qué colores buscar, solo que pongas las que se parecen juntas. Al final tendrás un montón de "rojizas", otro de "azuladas", etc., sin que yo te dijera cómo hacerlo.
+**Definición Simple:**
+Organizar invitados en 3 mesas. Primero se sientan al azar. Luego se mueven a la mesa donde se sientan más "parecidos" a ellos. Luego calculamos el "centro" de personalidad de la mesa. Repetimos hasta que nadie se cambie de mesa.
 
-**Ejemplos:**
-*   **Cotidiano:** Netflix creando grupos de usuarios con gustos similares ("Amantes de comedias").
-*   **Científico:** Clasificar nuevas especies de plantas por su forma sin saber sus nombres.
-
-#### E. Análisis de Componentes Principales (PCA)
+#### H. Clustering Jerárquico y Aglomerativo
 
 **¿Qué resuelve?**
-Simplifica datos complejos reduciendo su cantidad de variables, pero conservando la información importante.
-
-**¿Por qué es importante?**
-Permite visualizar datos de muchas dimensiones (imposibles de ver para humanos) y elimina el "ruido".
+Crea una jerarquía de clusters (dendrograma) sin necesitar definir el número de grupos $k$ de antemano.
 
 **Definición Técnica:**
-Transformación ortogonal que proyecta datos a un nuevo sistema de coordenadas (componentes principales) donde la varianza se maximiza progresivamente. Utiliza valores propios de la matriz de covarianza.
+*   *Aglomerativo (Bottom-Up):* Empieza con $n$ clusters (uno por dato) y fusiona los dos más cercanos iterativamente usando una métrica de enlace (Linkage: ward, single, complete) hasta tener un solo cluster.
 
-**Definición Simple (Secundaria):**
-Imagina la sombra de un objeto 3D (como una tetera) en la pared. El objeto es complejo, pero la sombra es plana (2D). Si giras la tetera hasta que la sombra muestre su forma más clara (donde se ve el mango y el pico), has hecho un PCA: has reducido un objeto 3D a una imagen 2D perdiendo la menor cantidad de detalle posible.
+**Definición Simple:**
+Imagina un árbol genealógico al revés. Empiezas con individuos, luego juntas hermanos, luego primos, hasta llegar al ancestro común. Puedes "cortar" el árbol a la altura que quieras para obtener los grupos.
 
-**Ejemplos:**
-*   **Cotidiano:** Comprimir una imagen JPG (quitas datos pero la foto se ve casi igual).
-*   **Científico:** Analizar miles de genes y encontrar los 2 o 3 "super-genes" responsables de una enfermedad.
+#### I. Evaluación de Calidad de Clusters
+
+¿Cómo sabemos si los grupos son buenos sin tener etiquetas?
+*   **Coeficiente de Silhouette:** Mide qué tan similar es un punto a su propio cluster comparado con otros clusters (Rango -1 a 1).
+*   **Índice de Rand Ajustado (ARI):** Mide la similitud entre dos asignaciones de clusters, ajustado por el azar.
+*   **Estadístico GAP:** Compara la dispersión del cluster con una distribución aleatoria nula uniforme.
+*   **AIC / BIC:** Criterios de Información (Akaike/Bayesiano) que penalizan la complejidad del modelo (número de clusters) para evitar sobreajuste.
+
+#### J. Modelos de Mezcla Gaussiana (GMM) y Algoritmo EM
+
+**¿Qué resuelve?**
+Clustering "suave" probabilístico. Asume que los datos vienen de una mezcla de distribuciones normales.
+
+**Definición Técnica:**
+Utiliza el algoritmo **Esperanza-Maximización (EM)**.
+1.  **E-step:** Calcula la probabilidad de pertenencia de cada punto a cada gaussiana.
+2.  **M-step:** Actualiza los parámetros (media, covarianza) de las gaussianas basándose en esas probabilidades.
+
+**Definición Simple:**
+K-Means dibuja círculos duros. GMM dibuja nubes difusas. Un punto puede ser "70% del cluster A y 30% del cluster B".
 
 ---
 
-## 7. Ciencia de Datos Avanzada
+### 6.4 Inferencia Causal y Métodos Avanzados
 
-Esta sección aborda conceptos de frontera que modelan sistemas dinámicos, relacionales y no estructurados de alta complejidad.
+#### K. Causalidad vs Correlación
 
-### G. Cálculo Estocástico
-*Modelar sistemas que cambian con el azar (mercados financieros, difusión).*
-*   **Concepto:** Ecuaciones diferenciales donde el "ruido" es parte de la ecuación ($dX_t = \mu dt + \sigma dW_t$).
+**¿Qué resuelve?**
+Distingue si X *causa* Y o si solo se mueven juntos.
 
-### H. Teoría de Grafos
-*Analizar redes y conexiones.*
-*   **Concepto:** Usar matemáticas de redes (nodos y aristas) para encontrar influencers, comunidades o rutas óptimas.
+*   **Variable de Confusión:** Una variable Z que influye tanto en X como en Y, creando una falsa asociación. (Ej: Consumo de helado y ataques de tiburón correlacionan, pero la causa común es el "Verano").
+*   **Exogeneidad Condicional:** Supuesto de que, controlando por ciertas variables, el error es independiente de las variables explicativas.
 
-### I. Modelado NoSQL
-*Manejo de datos masivos y flexibles.*
-*   **Concepto:** Bases de datos que no usan tablas rígidas, sino documentos o grafos para escalar globalmente (Teorema CAP).
+#### L. Inferencia en Alta Dimensión (High-Dimensional Inference)
+
+**¿Qué resuelve?**
+Hacer estadística válida cuando hay más variables que datos ($p > n$).
+
+*   **Teorema Post-Lasso (Chernozhukov):** Procedimiento de dos pasos para inferencia válida. 1) Usar Lasso para seleccionar variables relevantes (Active Set). 2) Hacer OLS estándar solo con esas variables seleccionadas para reducir el sesgo de contracción.
+*   **Método LAVA (Local Aggregate / Variational):** Técnicas modernas para manejar estructuras latentes complejas o señales mixtas (sparsas y densas) en genómica y big data.
+
+---
+
+## 7. Ciencia de Datos Avanzada: Grafos y Procesos Estocásticos
+
+### M. Teoría de Grafos y Clustering Espectral
+*   **Matriz de Adyacencia:** Representa conexiones.
+*   **Clustering Espectral:** Usa los eigenvectores del Laplaciano para separar grafos cortando pocas aristas (Min-Cut).
+*   **Modularidad:** Medida de la estructura de una red; compara la densidad de bordes dentro de comunidades con la esperada al azar.
+*   **Embeddings (Encajes):** Mapear nodos de un grafo complejo a vectores en $R^n$ (ej. Node2Vec) preservando su vecindad.
+
+### N. Procesos de Márkov y LDA
+*   **Cadenas de Márkov:** Sistemas donde el estado futuro depende solo del estado actual, no del pasado ("falta de memoria"). Base de algoritmos como PageRank.
+*   **Latent Dirichlet Allocation (LDA):** Modelo generativo para descubrir temas abstractos en documentos (Topic Modeling). Usa **Inferencia Variacional Estocástica (SVI)** para aproximar distribuciones posteriores complejas mediante optimización, escalando a millones de documentos.
 
 ---
 
 ## 8. Herramientas de Aplicación
 
-*   **Python:** El lenguaje principal (Librerías: Pandas, Scikit-Learn).
-*   **R:** Potente para estadística pura.
-*   **SQL:** El idioma de las bases de datos.
-*   **TensorFlow/PyTorch:** Para Inteligencia Artificial avanzada.
+*   **Python:** Scikit-Learn (ML clásico), PyTorch/TensorFlow (Deep Learning), NetworkX (Grafos).
+*   **R:** `glmnet` (Lasso/Ridge), `caret`.
+*   **SQL/NoSQL:** MongoDB, Neo4j.
 
 ---
 
 ## 9. Referencias Bibliográficas Serias
 
 1.  **Bishop, C. M. (2006).** *Pattern Recognition and Machine Learning*. Springer.
-2.  **Hastie, T., et al. (2009).** *The Elements of Statistical Learning*. Springer.
-3.  **Goodfellow, I., et al. (2016).** *Deep Learning*. MIT Press.
+2.  **Hastie, T., Tibshirani, R., & Friedman, J. (2009).** *The Elements of Statistical Learning*. Springer.
+3.  **Goodfellow, I., Bengio, Y., & Courville, A. (2016).** *Deep Learning*. MIT Press.
 4.  **Casella, G., & Berger, R. L. (2002).** *Statistical Inference*. Duxbury.
-5.  **Tukey, J. W. (1962).** *The Future of Data Analysis*.
-6.  **Newman, M. (2018).** *Networks*.
-7.  **Kleppmann, M. (2017).** *Designing Data-Intensive Applications*.
+5.  **Chernozhukov, V., et al. (2015).** *Post-Selection and Post-Regularization Inference in Linear Models with Many Controls and Instruments*. American Economic Review. (Referencia clave para Post-Lasso).
+6.  **Blei, D. M., Ng, A. Y., & Jordan, M. I. (2003).** *Latent Dirichlet Allocation*. Journal of Machine Learning Research. (Referencia clave para LDA).
+7.  **Newman, M. (2018).** *Networks*. Oxford University Press.
+8.  **Vapnik, V. N. (1995).** *The Nature of Statistical Learning Theory*. Springer. (Fundador de las SVM).
+9.  **Pearl, J. (2009).** *Causality*. Cambridge University Press. (La referencia definitiva en inferencia causal).
+10. **Tukey, J. W. (1962).** *The Future of Data Analysis*.
