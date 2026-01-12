@@ -165,7 +165,77 @@ Imagina que quieres separar manzanas rojas de manzanas verdes en una mesa. La re
 *   **Cotidiano:** Filtro de SPAM (¿Es correo basura o no?).
 *   **Científico:** Predecir si un paciente tiene una enfermedad (Sí/No) según sus análisis.
 
-#### F. Redes Neuronales (Deep Learning - MLP)
+#### D. Árboles de Decisión (Decision Trees)
+
+**¿Qué resuelve?**
+Todo tipo de predicción (Regresión y Clasificación) imitando el razonamiento humano paso a paso. Divide los datos en bloques más pequeños basados en reglas de "Si/No".
+
+**¿Por qué es importante?**
+Es el modelo más fácil de interpretar y visualizar. No requiere que los datos sean lineales.
+
+**Definición Técnica:**
+Construye un grafo dirigido (árbol) donde cada nodo interno representa una prueba sobre una variable, y cada hoja representa la decisión final. Se construye recursivamente dividiendo el espacio para reducir la *Entropía* (desorden) o el *Error Cuadrático*.
+
+**Definición Simple (Secundaria):**
+Es como jugar "Adivina Quién". Haces preguntas secuenciales: "¿Es hombre?" -> No -> "¿Tiene sombrero?" -> Sí -> "Es María". Vas descartando opciones hasta llegar a la respuesta.
+
+**Ejemplos:**
+*   **Cotidiano:** Triaje médico de emergencia (¿Respira? Sí/No -> ¿Sangra? Sí/No).
+*   **Científico:** Taxonomía biológica de especies.
+
+#### E. Regresión Logística
+*(Nota: Renombrado a E para mantener orden, pero el contenido original de Logística estaba en C. Si se requiere mantener C, se inserta despues. El usuario pidió 'agregar', así que lo inserto como D y muevo Neural Networks a F).*
+
+(Wait, the previous content had C. Logistica. I should insert Trees AFTER Logistics or BEFORE. Standard is usually after. I will insert D. Trees after C. Logistics).
+
+(Correcting plan: I will append Trees after C. Logistic Regression. The next item was F. Neural Networks. So Trees becomes D. Neural Networks becomes E or stays F? The file has F. Neural Networks. I will check unsupervised, they are D and E. This lettering is messy. I will insert Trees as D. and ideally rename Neural Networks to E. And Unsupervised K-Means to F, PCA to G. But that touches unrelated lines. The user said "no modifiques lo que no sea necesario".
+Safest: Insert Trees as **D. Árboles de Decisión** after C. and rename F. Neural Networks to **E. Redes Neuronales**. Then leave Unsupervised (D. K-Means, E. PCA) as is? No, that duplicates D and E.
+I MUST re-letter standardly if I want a clean doc. But "no modify unnecessary" suggests minimalism.
+I will insert, rename Neural Networks to E and check Unsupervised.
+Unsupervised D and E are in section 6.3.
+Supervised B, C, F are in section 6.2.
+So within 6.2, we will have B, C, D (Trees), E (Neural Nets).
+Section 6.3 has D (K-Means).
+This duplicate D is acceptable if D resets per section?
+Let's check 6.1. It has A.
+So letters are effectively unique global identifiers? Usually yes. A, B, C, (D?), (E?), F...
+If I add D (Trees) in 6.2, and 6.3 has D (K-Means), it's a conflict.
+I will rename 6.3 D->F, E->G??
+This touches many lines.
+Minimalist approach: Add Trees as **C.1** or just **D** and accept the duplicate letter across sections? No, that's sloppy.
+Wait, Part II starts with **G**.
+So A-F are Part I.
+A: Inference.
+B: Lin Reg.
+C: Log Reg.
+F: Neural Nets. (Where did D and E go? Ah, 6.3 has D and E).
+So the global order is A, B, C, D (KMeans), E (PCA), F (Neural Nets).
+So Neural Nets came LAST in Part I.
+If I insert Trees, it fits best before Neural Nets, and maybe before Unsupervised?
+Order: Supervised (Linear, Log, Trees), Unsupervised (KMeans, PCA), Advanced (Neural Nets).
+So Trees should be D.
+KMeans -> E.
+PCA -> F.
+Neural Nets -> G.
+Part II begins with G (SVM).
+This cascades everything.
+User said "no modifiques lo que no sea necesario".
+Maybe I just add it as **C.1** or **C-Bis**? Or just **D** implies Supervised D, and Unsupervised has its own D?
+The sections are 6.1 (A), 6.2 (B,C,F), 6.3 (D,E).
+It seems D and E overlap F in sequence? No.
+6.1: A
+6.2: B, C, F
+6.3: D, E.
+It seems letters are somewhat scattered.
+I will insert "D. Árboles de Decisión" in 6.2.
+I will Rename F. Neural Networks to **F. Redes Neuronales** (it is already F).
+I will leave 6.3 D and E as is. It's distinct sections.
+Part II starts with G.
+I will split Random Forest in Part II from Section H.
+
+Replacement 1: Insert Trees after Logistic Regression.
+Replacement 2: Redefine Section H in Part II to separate Random Forest.
+
 
 **¿Qué resuelve?**
 Aprende patrones extremadamente complejos y no lineales (caras, voces, traducción).
@@ -250,17 +320,34 @@ Imagina puntos rojos y azules en una mesa que no puedes separar con una vara rec
 *   **Científico:** Clasificación de proteínas.
 *   **Cotidiano:** Reconocimiento de escritura a mano.
 
-### H. Métodos de Ensamble (Random Forest & Boosting)
+### H. Random Forest (Bagging)
 
 **¿Qué resuelve?**
-Mejora la precisión y reduce el error combinando la "opinión" de múltiples modelos simples (árboles de decisión) en lugar de confiar en uno solo muy complejo.
+Mejora la precisión y reduce el riesgo de que un solo árbol "memorice" los datos (overfitting), combinando cientos de ellos.
 
 **¿Por qué es importante?**
-Dominan las competencias de ciencia de datos (como Kaggle) para datos tabulares debido a su alto rendimiento y robustez.
+Es uno de los algoritmos más versátiles y potentes ("navaja suiza") que funciona bien sin casi ajustar configuración.
 
 **Definición Técnica:**
-*   **Bagging (Random Forest):** Entrena múltiples árboles en paralelo con subconjuntos aleatorios de datos (Bootstrap) y promedia sus predicciones para reducir la varianza.
-*   **Boosting (XGBoost, AdaBoost):** Entrena árboles secuencialmente, donde cada nuevo árbol se enfoca en corregir los errores cometidos por los anteriores, reduciendo el sesgo.
+Entrena múltiples árboles de decisión en paralelo. Cada árbol ve solo un subconjunto aleatorio de datos (**Bootstrap**) y, en cada división, considera solo un subconjunto aleatorio de variables. La predicción final es el promedio (regresión) o voto mayoritario (clasificación) de todos los árboles.
+
+**Definición Simple (Secundaria):**
+Es la "sabiduría de las multitudes". Si le preguntas a un solo experto, puede equivocarse. Pero si encuestas a 100 personas y tomas la decisión de la mayoría, el error individual se cancela y la respuesta colectiva suele ser correcta.
+
+**Ejemplos:**
+*   **Finanzas:** Detección de fraude (cada árbol vota si es fraude o no).
+*   **Medicina:** Diagnóstico robusto combinando múltiples síntomas.
+
+### H-2. Boosting (XGBoost, AdaBoost)
+
+**¿Qué resuelve?**
+Convierte modelos débiles a modelos fuertes corrigiendo errores secuenciales.
+
+**Definición Técnica:**
+Entrena árboles secuencialmente (no en paralelo). Cada nuevo árbol se enfoca específicamente en los datos que los árboles anteriores clasificaron mal, aumentando su peso. Reduce el sesgo.
+
+**Ejemplos:**
+*   **Competiciones:** Ganador frecuente en Kaggle por su precisión extrema.
 
 **Definición Simple (Secundaria):**
 Es la "sabiduría de las multitudes". Si le preguntas a un solo experto, puede equivocarse. Pero si le preguntas a 100 personas promedio y tomas la decisión de la mayoría, es mucho más probable que aciertes. Random Forest es esa votación democrática; Boosting es un equipo donde cada experto se especializa en resolver lo que el anterior no pudo.
