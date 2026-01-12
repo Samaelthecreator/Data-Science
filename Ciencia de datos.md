@@ -453,7 +453,83 @@ Modifica la escala, forma o distribución de los datos para que cumplan con las 
 
 ---
 
-## 13. Bibliografía
+---
+
+# PARTE III: PROBLEMAS Y REPASO PRÁCTICO
+*Aplicación de conocimientos para desarrollar la intuición del científico de datos.*
+
+## 13. Casos de Estudio: Selección de Métodos
+
+A continuación, se presentan problemas del mundo real. Tu objetivo es identificar qué método (o métodos) es el más adecuado para resolverlo.
+
+### A. Identificación de Método Único
+
+**Problema 1: El Banco Cauteloso**
+Un banco quiere decidir automáticamente si aprobar o denegar préstamos basándose en el historial financiero de los solicitantes (ingresos, deuda, edad). Tienen una base de datos histórica de 50,000 clientes con la etiqueta de si pagaron o no su préstamo.
+
+*   **Solución Sugerida:** Clasificación Supervisada (Regresión Logística o Random Forest).
+*   **¿Por qué?:** Es un problema binario (Aprobar/Denegar) y tenemos datos históricos etiquetados ($Y$ conocida). La Regresión Logística es ideal si se requiere explicar la decisión; Random Forest si se busca máxima precisión.
+
+**Problema 2: Biología Desconocida**
+Un equipo de biólogos marinos ha recolectado datos de dimensiones (largo, ancho, peso) de 1,000 peces en una zona inexplorada del océano. No saben cuántas especies hay ni cómo se llaman. Quieren agruparlos para estudiarlos.
+
+*   **Solución Sugerida:** Clustering (K-Means o GMM).
+*   **¿Por qué?:** No hay etiquetas predefinidas (Aprendizaje No Supervisado). El objetivo es descubrir la estructura latente en los datos. GMM sería superior si los grupos se solapan (clustering suave); K-means si son grupos compactos y esféricos.
+
+**Problema 3: Predicción de Ventas Inmobiliarias**
+Una agencia quiere estimar el precio de venta exacto de una casa basándose en sus características (m2, número de habitaciones, ubicación, antigüedad).
+
+*   **Solución Sugerida:** Regresión (Lineal Múltiple o Gradient Boosting para Regresión).
+*   **¿Por qué?:** La variable objetivo es un número continuo (precio), no una categoría.
+
+---
+
+### B. Problemas Multietapa (Pipelines)
+
+En la vida real, un solo algoritmo rara vez es suficiente. A menudo necesitamos una cadena de procesos.
+
+**Problema 4: Análisis Genómico de Alto Rendimiento**
+Un hospital quiere detectar qué genes predisponen a un tipo raro de cáncer. Tienen muestras de ADN de solo 100 pacientes, pero cada muestra tiene 20,000 variables genéticas (genes). Además, los datos del secuenciador a veces tienen errores de lectura (valores nulos).
+
+*   **Solución Sugerida (Pipeline):** 
+    1.  **Imputación:** Rellenar valores nulos (MICE o K-NN).
+    2.  **Regularización (Lasso/Elastic Net):** Selección de características.
+    3.  **Clasificación (SVM o Regresión Logística Penalizada).**
+*   **¿Por qué es importante combinar métodos?:**
+    *   Si usas Regresión Logística normal directamente, fallará porque $p$ (20,000) >>> $n$ (100). Necesitas **Lasso** o **Elastic Net** para purgar las 19,950 variables inútiles y quedarte con los 50 genes relevantes.
+    *   No puedes entrenar con huecos (NaN), por lo que la **Imputación** es un paso previo obligatorio.
+
+**Problema 5: Segmentación de Clientes con "Big Data" Sucia**
+Una empresa de e-commerce quiere agrupar a sus millones de usuarios según su comportamiento de compra para enviar ofertas personalizadas. Los datos incluyen historial de clicks (millones de registros), texto de reseñas y montos gastados.
+
+*   **Solución Sugerida (Pipeline):**
+    1.  **Ingeniería de Características:** Convertir texto de reseñas a vectores (TF-IDF o Embeddings) y agregar historial de clicks.
+    2.  **Reducción de Dimensionalidad (PCA):** Comprimir las miles de variables resultantes para eliminar ruido y redundancia.
+    3.  **Clustering (K-Means Mini-Batch):** Agrupar a los usuarios en segmentos (ej. "Cazadores de ofertas", "Compradores compulsivos").
+*   **¿Por qué es importante combinar métodos?:**
+    *   K-Means sufre la "maldición de la dimensionalidad". Si le das 10,000 columnas sin procesar, las distancias pierden sentido y el algoritmo será lentísimo e ineficaz. **PCA** lo hace viable.
+
+---
+
+## 14. Actividad Integradora: "El Consultor de Datos"
+
+**Instrucciones:** Lee las siguientes afirmaciones de un cliente ficticio y determina si su intuición es **Verdadera** o **Falsa**, justificando tu respuesta técnicamente.
+
+1.  **"Tengo datos de ventas de 10 años, pero no tengo etiquetas de qué clientes se fueron (churn). ¿Puedo usar Regresión Logística para predecir quién se irá el próximo mes?"**
+    *   **Veredicto:** **Falso.**
+    *   **Justificación:** La Regresión Logística es Aprendizaje Supervisado. Requiere forzosamente datos históricos etiquetados ($Y=1$ si se fue, $0$ si no) para aprender el patrón. Sin etiquetas, solo podrías hacer Clustering o Detección de Anomalías, pero no predicción directa calibrada.
+
+2.  **"Mi modelo tiene un 99% de exactitud (accuracy) detectando fraude. Como solo el 0.1% de las transacciones son fraude real, el modelo es excelente."**
+    *   **Veredicto:** **Falso (Probablemente).**
+    *   **Justificación:** Estás cayendo en la "Paradoja de la Exactitud". Si un modelo dice "No es fraude" siempre, tendrá 99.9% de exactitud, pero será inútil (0% de Recall). Debes usar métricas como **F-Score**, **AUC-ROC** o **Precision-Recall** para validar clases desbalanceadas.
+
+3.  **"Quiero usar K-Means para agrupar mis tiendas, pero algunas venden $100 y otras $1,000,000. ¿Debo usar los datos tal cual?"**
+    *   **Veredicto:** **Falso.**
+    *   **Justificación:** K-Means se basa en distancias Euclidianas. Las variables con magnitudes grandes dominarán completamente el cálculo, haciendo que las pequeñas sean ignoradas. Es obligatorio aplicar **Estandarización (Z-Score)** antes de clusterizar.
+
+---
+
+## 15. Bibliografía
 1.  **Bishop, C. M.** (2006). *Pattern Recognition and Machine Learning*. Springer.
 2.  **Hastie, T., Tibshirani, R., & Friedman, J.** (2009). *The Elements of Statistical Learning*. Springer.
 3.  **Murphy, K. P.** (2012). *Machine Learning: A Probabilistic Perspective*. MIT Press.
