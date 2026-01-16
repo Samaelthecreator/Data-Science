@@ -1,176 +1,128 @@
-# Calculo Estocástico
+# Fundamentos de Cálculo Estocástico y Series Temporales
 
-Un proceso etocástico es un proceso aleatorio que evoluciona con el tiempo. Estos procesos se modelan a partir de sucesiones o colecciones matemáticas.
-Cada una de las variables aleatorias del proceso tienen su propia funcion de distribución de probabilidad y pueden o no estar correlacionadas entre si.
+> **Nota del Revisor (Albert):** Este documento ha sido reestructurado para cumplir con estándares de rigor académico. Se asume familiaridad con Teoría de la Medida y Análisis Real.
 
-Cada variable o conjunto de variables sometidas a influencias o efectos aleatorios constituye un proceso estocástico.
+## 1. Definición Axiomática de Procesos Estocásticos
 
+Un **proceso estocástico** no es simplemente una "colección de variables". Es un objeto matemático definido sobre un espacio de probabilidad.
 
-## Series en tiempo.
-Las series en tiempo son una forma de modelar un proceso estocástico a través de sucesiones matemáticas {y}_t, donde t es el tiempo. 
+### 1.1 Espacio de Probabilidad Filtrado
+Sea $(\Omega, \mathcal{F}, \mathbb{P})$ un espacio de probabilidad, donde:
+*   $\Omega$: Espacio muestral (conjunto de todos los posibles resultados).
+*   $\mathcal{F}$: Una $\sigma$-álgebra sobre $\Omega$ (conjunto de eventos medibles).
+*   $\mathbb{P}$: Una medida de probabilidad $\mathbb{P}: \mathcal{F} \to [0, 1]$.
 
-Existen  dos tipos de series de tiempo:
+Un proceso estocástico $X = \{X_t : t \in T\}$ es una colección de variables aleatorias definidas en $\Omega$ con valores en un espacio de estados $S$ (usualmente $\mathbb{R}^d$).
 
-Por el tipo de variable aleatoria:
-    - Continua: Son series de tiempo que contienen variables aleatorias continuas.
-    Ejemplos: procesos de Poisson, procesos de renovación, cadenas de markov a tiempo continuo, Procesos de nacimiento y muerte, modelos de colas, movimiento browniano.
-    - Discreta: Son series de tiempo que contienen variables aleatorias discretas.
-    Ejemplos: Cadenas de markov a tiempo discreto, Martingalas a tiempo discreto
-Por la dimensión de la variable aleatoria:
-    - Univariadas: Son series de tiempo que solo contienen una variable aleatoria.
-    - Multivariadas: Son series de tiempo que contienen varias variables aleatorias.
+### 1.2 Filtración y Flujo de Información
+Para modelar la "información disponible hasta el tiempo $t$", introducimos el concepto de **filtración** $\{\mathcal{F}_t\}_{t \in T}$.
+*   Es una familia creciente de sub-$\sigma$-álgebras: $\mathcal{F}_s \subseteq \mathcal{F}_t \subseteq \mathcal{F}$ para todo $s \le t$.
+*   Decimos que el proceso $X$ es **adaptado** a la filtración si $X_t$ es $\mathcal{F}_t$-medible para todo $t$.
+*   Interpretación: En el tiempo $t$, conocemos el valor de $X_t$, pero el futuro $X_{t+h}$ es incierto (una variable aleatoria no constante respecto a $\mathcal{F}_t$).
 
-Hint: Las mediciones en las series tienen que ser independientes de procesos de medición
-Generalmente se usan tasas o indices (comprobar y extender)
+---
 
-### Carácteristicas de las series en tiempo.
-Con base en la construcción matemática de las series en tiempo, estas tienen las siguientes características:
+## 2. Clasificación Temporal
 
-1.- Longitud de la serie o intervalo de válidez/tiempo:Esto representa el intervalo de tiempo que representa la serie.
+### 2.1 Series de Tiempo (Tiempo Discreto)
+Aquí $T = \mathbb{Z}$ o $T = \mathbb{N}$.
+Una serie de tiempo se denota como $\{X_t\}_{t \in \mathbb{Z}}$.
+*   **Ejemplos:** Cadenas de Markov en tiempo discreto, procesos ARMA, GARCH.
+*   **Operador de Retardo (Lag Operator):** $L X_t = X_{t-1}$. Fundamental para representar ecuaciones en diferencias estocásticas:
+    $$A(L)X_t = B(L)\varepsilon_t$$
 
-2.- Partición o numero de elementos: representa el valor de las observaciones en el intervalo de tiempo (evento aleatorio) y tambien se denomina como resolución de la serie.
+### 2.2 Procesos en Tiempo Continuo
+Aquí $T = [0, \infty)$ o $T = \mathbb{R}$.
+*   **Ejemplos:** Movimiento Browniano (Proceso de Wiener), Procesos de Poisson, Difusiones de Itô.
+*   **Regularidad de Trayectorias:** Conceptos como continuidad, diferenciabilidad y variación acotada son críticos.
+    *   *Nota:* Las trayectorias del Movimiento Browniano son continuas en casi todas partes, pero no diferenciables en ninguna parte.
 
-Tambien se consideran las siguientes carácteristicas
+---
 
-3.- Nivel o media de la serie: representa el valor promedio de todas las variables aleatorias del proceso.
+## 3. Estacionariedad y Dependencia
 
-4.- Varianza de la serie: representa la dispersión de las variables aleatorias del proceso con respecto a su media.
+La noción intuitiva de "estabilidad" se formaliza mediante dos conceptos distintos.
 
-5.- Desviación estándar de la serie: representa la raiz cuadrada de la varianza de las variables aleatorias del proceso con respecto a su media.
+### 3.1 Estacionariedad Fuerte (Strict-Sense Stationarity)
+El proceso $\{X_t\}$ es estrictamente estacionario si la distribución conjunta de $(X_{t_1}, \dots, X_{t_k})$ es idéntica a la de $(X_{t_1+h}, \dots, X_{t_k+h})$ para cualquier $h$ y cualquier conjunto finito de índices.
+*   Impacto: Toda la estructura probabilística es invariante ante traslaciones temporales.
 
-6.- frecuencia de la serie: representa la cantidad de mediciones en un intervalo de tiempo.
+### 3.2 Estacionariedad Débil (Covariance Stationarity)
+Es la condición estándar en análisis de series temporales (e.g., Box-Jenkins). Requiere:
+1.  Existencia de momentos de segundo orden: $\mathbb{E}[X_t^2] < \infty$.
+2.  Media constante: $\mathbb{E}[X_t] = \mu$ para todo $t$.
+3.  Autocovarianza dependiente solo del rezago (lag):
+    $$Cov(X_t, X_{t+h}) = \gamma(h)$$
 
+**Función de Autocorrelación (ACF):**
+$$\rho(h) = \frac{\gamma(h)}{\gamma(0)}$$
 
-COMENTARIOS: ¿Existen más caracteristicas importantes de las series? las mas importantes en este momento son las que determinan los componentes de la serie (ej: estacionalidad, tendencia, estacionariedad) como condiciones necesarias para la aplicación de modelos predictivos.
+> **¡Atención!** Un proceso puede ser débilmente estacionario pero no estrictamente estacionario (ej. procesos con momentos superiores cambiantes). Inversamente, un proceso estrictamente estacionario sin segundo momento finito (ej. distribución de Cauchy) no es débilmente estacionario.
 
-revisar si el punto 6 no es el mismo que el dos.
+---
 
+## 4. Ruido Blanco y Martingalas
 
-### Componentes de la series en tiempo.
+Es crucial distinguir entre tipos de independencia y "falta de memoria".
 
-Los componentes de la series en tiempo son los siguientes:
+### 4.1 Ruido Blanco (White Noise)
+Un proceso $\{\varepsilon_t\}$ es Ruido Blanco (WN) si:
+1.  $\mathbb{E}[\varepsilon_t] = 0$.
+2.  $Var(\varepsilon_t) = \sigma^2 < \infty$.
+3.  $\gamma(h) = 0$ para todo $h \neq 0$ (incorrelación).
 
-1.- Estacionalidad: Determina la presencia de crestas y valles periodicos en la serie en un tiempo relativamente corto (a veces en semanas o meses - promedio de un ciclo de un año).
+*   **Ruido Blanco Gaussiano:** Si además $\varepsilon_t \sim \mathcal{N}(0, \sigma^2)$.
+*   **Ruido Blanco IID:** Si las variables son independientes e idénticamente distribuidas. (Condición más fuerte que la incorrelación).
 
-2.- Tendencia: es la dirección general que toma la serie a lo largo del tiempo, esta puede ser:
-- Ascendente: cuando la serie crece a lo largo del tiempo.
-- Descendente: cuando la serie decrece a lo largo del tiempo.
-- Estacionaria: cuando la serie no tiene tendencia. (revisar)
+### 4.2 Martingalas y Diferencias de Martingala
+Una martingala es un proceso $\{M_t\}$ adaptado tal que $\mathbb{E}[|M_t|] < \infty$ y:
+$$\mathbb{E}[M_{t+1} | \mathcal{F}_t] = M_t$$
+Es el modelo matemático de un "juego justo". El mejor pronóstico de mañana es el valor de hoy.
 
-Si el nivel o la media de la serie cambia con respecto al tiempo, implica que existe una tendencia en la serie. Su desviación estandar es constante:
+Una **Diferencia de Martingala (MDS)** es un proceso $\{X_t\}$ tal que $\mathbb{E}[X_t | \mathcal{F}_{t-1}] = 0$.
+*   Todo MDS no correlacionada es Ruido Blanco, pero esto permite heterocedasticidad condicional (volatilidad cambiante), base de los modelos **ARCH/GARCH**.
 
-| Variable | estado | consideraciones |
-|-------|---------------------|
-| Media | variable | ""|
-| Desviación estándar | constante |"" |
+---
 
-3.-  Ciclo: Presencia de crecimiento y decrecimeinto en la serie de forma periodíca. A diferencia de la estacionalidad la variación ciclica o ciclo no presenta crestas y valles de la misma magnitud (generalmente varia)
+## 5. Transformaciones y Operadores
 
-| Variable | estado | consideraciones |
-|-------|---------------------|
-| Media | variable | ""|
-| Desviación estándar | variable |""|
+### 5.1 Diferenciación ($\Delta$)
+Usada para liminar tendencias estocásticas (raíces unitarias).
+$$\Delta X_t = (1-L)X_t = X_t - X_{t-1}$$
+Si un proceso requiere $d$ diferenciaciones para volverse estacionario, decimos que es Integrado de orden $d$, denotado $I(d)$.
 
-4.- Valores aberrantes o residuos: .
+### 5.2 Suavizado Exponencial (Enfoque Espacio-Estado)
+Más allá de fórmulas heurísticas, el suavizado exponencial simple corresponde a un modelo ARIMA(0,1,1) o a un modelo de Espacio de Estados de "Innovaciones Múltiples" con componentes no observables (Nivel local).
 
-Tipos de esquemas de series en tiempo:
+---
 
-    - Aditivo: Yt= Tt + Ct + St + e. 
-    - Multiplicativo: Yt= Tt * Ct * St * e.
-    - Mixto: Yt= Tt * (Ct + St) * e.
+## 6. Modelos Lineales Clásicos (Enfoque Wold)
 
+El **Teorema de Descomposición de Wold** establece que todo proceso estacionario de covarianza puramente no determinista puede escribirse como una suma infinita de ruidos blancos pasados:
+$$X_t = \sum_{j=0}^{\infty} \psi_j \varepsilon_{t-j}$$
+donde $\sum \psi_j^2 < \infty$.
 
-Estos son los componentes principales de una serie en tiempo.
+### Modelos ARMA(p, q)
+Aproximaciones racionales de parsimonia finita para la descomposición de Wold.
+$$ \phi(L) X_t = \theta(L) \varepsilon_t $$
+*   **Estacionariedad:** Requiere que las raíces del polinomio autorregresivo $\phi(z) = 0$ yazcan fuera del círculo unitario.
+*   **Invertibilidad:** Requiere que las raíces de $\theta(z) = 0$ yazcan fuera del círculo unitario (permite expresar el ruido como función del pasado observado).
 
-COMENTARIOS: se tendría que validar las definiciones de los componentes. En general se enseñan a determinar estos componentes a partir de su representación gráfica. Pero es importante poderlo determinar a partir de cantidades matemáticas (por ejemplo las variables en las tablas posteriores a la definición) y como podriamos calcular algunos otros parámetros para asegurarnos (sin uso gráfico) si existen estos componentes o no.
+---
 
-Para los tipos de esquema, desarrollarlos mas a profundidad escribiendo por que son importantes definirlos a partir de estos esquemas y ejemplos de.
+## 7. Métricas de Validación (Critique)
 
-### Estacionariedad
-Es importante diferenciar entre estacionariedad y estacionalidad. 
-Son aquellas series en las cuales
-tanto la media como la variabilidad de los valores en
-el tiempo es nula o casi nula. Sus medidas fundamentales son La media, la varianza y la covarianza (La heterocedasticidad es el concepto que define la alteración de la varianza)
-La serie estacionaria mantiene su media y varianza en el tiempo.
-De igual forma una serie no estacionaria es la que su varianza y media SI varían en el tiempo.
+Evitar el uso ciego de métricas. Seleccionar según la función de pérdida del problema.
 
+*   **MSE (Mean Squared Error):** Minimizado por la esperanza condicional $\mathbb{E}[X_{t+h}|\mathcal{F}_t]$. Penaliza fuertemente grandes errores.
+*   **MAE (Mean Absolute Error):** Minimizado por la mediana condicional. Robustez ante outliers.
+*   **Criterios de Información (AIC, BIC):**
+    $$AIC = -2 \ln(\mathcal{L}) + 2k$$
+    No son pruebas de hipótesis. Estiman la Divergencia de Kullback-Leibler entre el modelo y la verdad generadora de datos. El BIC es consistente (encuentra el modelo verdadero si $n \to \infty$), el AIC es eficiente (minimiza el error de predicción).
 
-### Ruido blanco: 
-Series temporales que presentan valores aleatorios que siguen una distribución normal con media cero y varianza constante. (revisar y ampliar) 
+---
 
-
-### Transformaciones
-
-Las series temporales tienen un conjunto de transformaciones con el objetivo de que, o bien sean descritas de mejor manera (que esta sucediendo) o bien se puedan predecir en un intervalo futuro.
-
-Estas transformaciones son:
-
-1.- Diferenciación: hacen que la media sea cero y esta definida por:
-        y(t) = y(t) -y(t-1)
-
-2.- Ajuste logaritmico: esto nos ayuda a hacer que la varianza sea constante.
-        y(t) = log(y(t))
-
-3.- Suavizado exponencial: 
-en general existen los diferentes tipos de suavizado exponencial:
-    - Simple:Estos son para series sin tendencia ni estacionalidad.
-    - Doble:Estos son para series con tendencia y sin estacionalidad.
-    - Triple:Estos son para series con tendencia y con estacionalidad.
-
-Si se desea realizar intervalos de predicción para pronósticos realizados mediante métodos de suavizado exponencial. Los intervalos de predicción requieren que los errores de pronóstico no esten correlacionados y estén distribuidos normalmente con media cero y varianza constante
-
-
-4.- Método ETS:
-
-
-5.- Método Naive (ingenuo): este método unicamente predice los valores futuros extendiendo el ultimo valor observado.
-
-6.- Método Naive estacionario: este método utiliza las variaciones ciclicas con la tendencia para predecir los valores futuros.
-
-
-
-### Métodos predictivos (forecasting)
-
-Los siguientes modelos se definen para series estacionarias.
-
-Modelo ARMA (media movil autoregresiva): un modelo ARMA (promedio móvil) se
-usa generalmente para modelar una serie de tiempo
-que muestra dependencias a corto plazo entre
-observaciones sucesivas
-
-
-Modelo ARIMA (media movil autoregresiva integrada): Un modelo ARIMA (p,d,q) , p representa el orden del proceso autoregresivo, d el numero de diferencias que son necesarias para que el proceso sea estacionario y q representa el orden del proceso de medias móviles.
-
-Las recomendaciones generales a la hora de realizar modelos predictivos en series temporales son:
-
-
-Modelo SARMA:
-
-
-
-• El pronóstico se debe realizar por un período o un
-horizonte h, que debe ser como máximo igual al
-periodo observado, pues, en términos generales,
-los modelos predictivos, en la medida en la que se
-alejan del último dato recogido, se van haciendo
-más laxos y por lo tanto menos fiables.
-• Se debe seleccionar aquel modelo que muestre un
-menor valor en su medida depresión de pronóstico
-para conseguir pronósticos menos amplios.
-
-
-
-COMENTARIOS: que son los ordenes en estos modelos?, por que es importante el AIC,BIC, ALcc. ¿Que es el periodo de horizonte h y cuales son sus demarcaciones?
-
-¿Que son los retardos y los rezagos?
-
-### Parámetros de validación.
-
--Error absoluto medio (MAE): 
-- Error cuadratico medio (MSE): 
-- Raiz del error cuadrático medio (RMSE):
-- Error absoluto medio normalizado (NMAE): 
--Error porcentual Medio (MPE):
-- Error porcentual Medio Absoluto (MAPE):
-- Coeficiente de U de theil
-
+## Bibliografía Recomendada
+1.  **Hamilton, J. D.** (1994). *Time Series Analysis*. Princeton University Press. (La referencia canónica).
+2.  **Brockwell, P. J., & Davis, R. A.** (1991). *Time Series: Theory and Methods*. Springer. (Rigor matemático alto).
+3.  **Øksendal, B.** (2003). *Stochastic Differential Equations*. Springer. (Introducción estándar a procesos continuos).
