@@ -183,59 +183,7 @@ Es como jugar "Adivina Quién". Haces preguntas secuenciales: "¿Es hombre?" -> 
 *   **Cotidiano:** Triaje médico de emergencia (¿Respira? Sí/No -> ¿Sangra? Sí/No).
 *   **Científico:** Taxonomía biológica de especies.
 
-#### E. Regresión Logística
-*(Nota: Renombrado a E para mantener orden, pero el contenido original de Logística estaba en C. Si se requiere mantener C, se inserta despues. El usuario pidió 'agregar', así que lo inserto como D y muevo Neural Networks a F).*
-
-(Wait, the previous content had C. Logistica. I should insert Trees AFTER Logistics or BEFORE. Standard is usually after. I will insert D. Trees after C. Logistics).
-
-(Correcting plan: I will append Trees after C. Logistic Regression. The next item was F. Neural Networks. So Trees becomes D. Neural Networks becomes E or stays F? The file has F. Neural Networks. I will check unsupervised, they are D and E. This lettering is messy. I will insert Trees as D. and ideally rename Neural Networks to E. And Unsupervised K-Means to F, PCA to G. But that touches unrelated lines. The user said "no modifiques lo que no sea necesario".
-Safest: Insert Trees as **D. Árboles de Decisión** after C. and rename F. Neural Networks to **E. Redes Neuronales**. Then leave Unsupervised (D. K-Means, E. PCA) as is? No, that duplicates D and E.
-I MUST re-letter standardly if I want a clean doc. But "no modify unnecessary" suggests minimalism.
-I will insert, rename Neural Networks to E and check Unsupervised.
-Unsupervised D and E are in section 6.3.
-Supervised B, C, F are in section 6.2.
-So within 6.2, we will have B, C, D (Trees), E (Neural Nets).
-Section 6.3 has D (K-Means).
-This duplicate D is acceptable if D resets per section?
-Let's check 6.1. It has A.
-So letters are effectively unique global identifiers? Usually yes. A, B, C, (D?), (E?), F...
-If I add D (Trees) in 6.2, and 6.3 has D (K-Means), it's a conflict.
-I will rename 6.3 D->F, E->G??
-This touches many lines.
-Minimalist approach: Add Trees as **C.1** or just **D** and accept the duplicate letter across sections? No, that's sloppy.
-Wait, Part II starts with **G**.
-So A-F are Part I.
-A: Inference.
-B: Lin Reg.
-C: Log Reg.
-F: Neural Nets. (Where did D and E go? Ah, 6.3 has D and E).
-So the global order is A, B, C, D (KMeans), E (PCA), F (Neural Nets).
-So Neural Nets came LAST in Part I.
-If I insert Trees, it fits best before Neural Nets, and maybe before Unsupervised?
-Order: Supervised (Linear, Log, Trees), Unsupervised (KMeans, PCA), Advanced (Neural Nets).
-So Trees should be D.
-KMeans -> E.
-PCA -> F.
-Neural Nets -> G.
-Part II begins with G (SVM).
-This cascades everything.
-User said "no modifiques lo que no sea necesario".
-Maybe I just add it as **C.1** or **C-Bis**? Or just **D** implies Supervised D, and Unsupervised has its own D?
-The sections are 6.1 (A), 6.2 (B,C,F), 6.3 (D,E).
-It seems D and E overlap F in sequence? No.
-6.1: A
-6.2: B, C, F
-6.3: D, E.
-It seems letters are somewhat scattered.
-I will insert "D. Árboles de Decisión" in 6.2.
-I will Rename F. Neural Networks to **F. Redes Neuronales** (it is already F).
-I will leave 6.3 D and E as is. It's distinct sections.
-Part II starts with G.
-I will split Random Forest in Part II from Section H.
-
-Replacement 1: Insert Trees after Logistic Regression.
-Replacement 2: Redefine Section H in Part II to separate Random Forest.
-
+#### E. Redes Neuronales (Deep Learning - MLP)
 
 **¿Qué resuelve?**
 Aprende patrones extremadamente complejos y no lineales (caras, voces, traducción).
@@ -259,7 +207,7 @@ Es como un equipo de personas pasándose un mensaje. La primera fila ve una foto
 
 Aquí, la computadora trabaja sola, sin maestro. Le damos datos ($X$) pero *no* le damos respuestas ($Y$). Su tarea es encontrar estructuras, grupos o patrones ocultos por sí misma.
 
-#### D. K-Means Clustering (Agrupamiento)
+#### F. K-Means Clustering (Agrupamiento)
 
 **¿Qué resuelve?**
 Agrupa objetos similares en "clusters" o montones, sin saber qué son esos objetos de antemano.
@@ -277,7 +225,7 @@ Imagina que tienes una bolsa de canicas de muchos colores mezclados y te pido qu
 *   **Cotidiano:** Netflix creando grupos de usuarios con gustos similares ("Amantes de comedias").
 *   **Científico:** Clasificar nuevas especies de plantas por su forma sin saber sus nombres.
 
-#### E. Análisis de Componentes Principales (PCA)
+#### G. Análisis de Componentes Principales (PCA)
 
 **¿Qué resuelve?**
 Simplifica datos complejos reduciendo su cantidad de variables, pero conservando la información importante.
@@ -302,7 +250,7 @@ Imagina la sombra de un objeto 3D (como una tetera) en la pared. El objeto es co
 
 ## 7. Estrategias Avanzadas de Aprendizaje Supervisado
 
-### G. Máquinas de Soporte Vectorial (SVM)
+### H. Máquinas de Soporte Vectorial (SVM)
 
 **¿Qué resuelve?**
 Clasifica datos que no son linealmente separables (ej. una nube de puntos rojos rodeada de puntos azules) mapeándolos a dimensiones superiores.
@@ -320,7 +268,7 @@ Imagina puntos rojos y azules en una mesa que no puedes separar con una vara rec
 *   **Científico:** Clasificación de proteínas.
 *   **Cotidiano:** Reconocimiento de escritura a mano.
 
-### H. Random Forest (Bagging)
+### I. Random Forest (Bagging)
 
 **¿Qué resuelve?**
 Mejora la precisión y reduce el riesgo de que un solo árbol "memorice" los datos (overfitting), combinando cientos de ellos.
@@ -338,7 +286,7 @@ Es la "sabiduría de las multitudes". Si le preguntas a un solo experto, puede e
 *   **Finanzas:** Detección de fraude (cada árbol vota si es fraude o no).
 *   **Medicina:** Diagnóstico robusto combinando múltiples síntomas.
 
-### H-2. Boosting (XGBoost, AdaBoost)
+### J. Boosting (XGBoost, AdaBoost)
 
 **¿Qué resuelve?**
 Convierte modelos débiles a modelos fuertes corrigiendo errores secuenciales.
@@ -360,7 +308,7 @@ Es la "sabiduría de las multitudes". Si le preguntas a un solo experto, puede e
 
 ## 8. Regresión y Regularización (Alta Dimensión)
 
-### I. Regresión Penalizada (Ridge, Lasso, Elastic Net)
+### K. Regresión Penalizada (Ridge, Lasso, Elastic Net)
 
 **¿Qué resuelve?**
 Permite entrenar modelos cuando hay demasiadas variables (incluso más variables que datos, $p > n$) o cuando las variables están muy correlacionadas (multicolinealidad), situaciones donde la regresión normal falla.
@@ -381,7 +329,7 @@ Imagina que quieres explicar el éxito de una película y tienes 1000 posibles r
 *   **Genómica:** Encontrar genes causantes de cáncer entre 20,000 posibilidades con solo 100 pacientes.
 *   **Economía:** Predicción de inflación con miles de indicadores macroeconómicos.
 
-### J. Inferencia Post-Lasso
+### L. Inferencia Post-Lasso
 
 **¿Qué resuelve?**
 Resuelve el problema de invalidez estadística que ocurre al usar los mismos datos para seleccionar variables y para testear hipótesis (Sesgo de Selección).
@@ -399,7 +347,7 @@ Si usas los datos para elegir a los "sospechosos" (variables) y luego usas los m
 
 ## 9. Validación y Métricas Rigurosas
 
-### K. Evaluación de Predicción
+### M. Evaluación de Predicción
 
 **¿Qué resuelve?**
 Cuantifica qué tan bueno es un modelo prediciendo la realidad y si es mejor que el azar o un promedio simple.
@@ -412,7 +360,7 @@ Cuantifica qué tan bueno es un modelo prediciendo la realidad y si es mejor que
     *   *F-Score:* Media armónica entre Precisión ($P = \frac{TP}{TP+FP}$) y Exhaustividad ($R = \frac{TP}{TP+FN}$). Identifica el balance óptimo.
     *   *ANOVA:* Análisis de Varianza para comparar si las diferencias en predicciones entre grupos son significativas.
 
-### L. Evaluación de Clusters (No Supervisado)
+### N. Evaluación de Clusters (No Supervisado)
 
 **¿Qué resuelve?**
 Determina si los grupos encontrados por un algoritmo son reales o meras coincidencias, ya que no hay "respuestas correctas" (etiquetas) para comparar.
@@ -422,7 +370,7 @@ Determina si los grupos encontrados por un algoritmo son reales o meras coincide
 *   **Estadístico GAP:** Compara la dispersión intra-cluster del modelo contra la dispersión esperada de una distribución aleatoria de referencia. Si el Gap es grande, los clusters son reales.
 *   **Índice de Rand Ajustado (ARI):** Mide la similitud entre dos agrupamientos (ej. uno real y uno predicho), corrigiendo por el azar. 0 es aleatorio, 1 es perfecto.
 
-### M. Criterios de Selección de Modelos (AIC / BIC)
+### O. Criterios de Selección de Modelos (AIC / BIC)
 
 **¿Qué resuelve?**
 Ayuda a elegir el mejor modelo buscando un equilibrio entre precisión (ajuste) y simplicidad (parsimonia).
@@ -439,7 +387,7 @@ Es la aplicación matemática del principio de la Navaja de Ockham: "La explicac
 
 ## 10. Aprendizaje No Supervisado Avanzado
 
-### N. Clustering Jerárquico
+### P. Clustering Jerárquico
 
 **¿Qué resuelve?**
 Organiza los datos en una estructura de árbol (dendrograma) de grupos anidados, mostrando relaciones de sub-grupos, sin necesidad de definir un número de clusters $k$ inicial.
@@ -451,7 +399,7 @@ Organiza los datos en una estructura de árbol (dendrograma) de grupos anidados,
 *   *Aglomerativo:* Comienza con $N$ clusters (cada punto es uno) y fusiona iterativamente los más cercanos.
 *   *Divisivo:* Comienza con 1 cluster gigante y lo divide recursivamente.
 
-### O. Modelos Probabilísticos (GMM & EM)
+### Q. Modelos Probabilísticos (GMM & EM)
 
 **¿Qué resuelve?**
 Permite el "Clustering Suave" (Soft Clustering), donde un punto puede pertenecer parcialmente a varios grupos con diferente probabilidad.
@@ -463,7 +411,7 @@ Permite el "Clustering Suave" (Soft Clustering), donde un punto puede pertenecer
 **Definición Simple (Secundaria):**
 En lugar de decir "Este cliente es VIP" (etiqueta rígida), dice "Este cliente tiene un 70% de probabilidad de ser VIP y un 30% de ser Regular". Captura mejor la ambigüedad y matices de la realidad.
 
-### P. Modelado de Tópicos (LDA)
+### R. Modelado de Tópicos (LDA)
 
 **¿Qué resuelve?**
 Descubre temas abstractos ocultos dentro de una colección masiva de documentos de texto.
@@ -478,7 +426,7 @@ Imagina que te dan mil licuados de frutas diferentes (documentos) y tienes que a
 
 ## 11. Sistemas Complejos y Estocásticos
 
-### Q. Teoría de Grafos y Redes
+### S. Teoría de Grafos y Redes
 
 **¿Qué resuelve?**
 Analiza relaciones y conectividad entre entidades, no solo sus propiedades individuales.
@@ -491,7 +439,7 @@ Analiza relaciones y conectividad entre entidades, no solo sus propiedades indiv
 **Ejemplo:**
 Redes sociales (detectar comunidades de amigos), Rutas logísticas, Análisis de fraude financiero (redes de lavado de dinero).
 
-### R. Cadenas de Markov
+### T. Cadenas de Markov
 
 **¿Qué resuelve?**
 Modela sistemas que cambian de estado aleatoriamente con el tiempo, donde el futuro depende únicamente del presente.
@@ -510,7 +458,7 @@ Es como un juego de mesa donde tu próximo movimiento depende solo de en qué ca
 
 ## 12. Ingeniería de Características (Feature Engineering)
 
-### S. Codificación (Encoding) e Imputación
+### U. Codificación (Encoding) e Imputación
 
 **¿Qué resuelve?**
 Transforma datos crudos incompatibles (texto, categorías, valores nulos) en un formato numérico limpio y completo que los algoritmos estandarizados pueden procesar matemáticamente.
@@ -529,7 +477,7 @@ Es como un traductor universal. Si le hablas en "Español" (palabras) a una calc
 *   **Finanzas:** Convertir "Nivel de Riesgo: Alto/Medio/Bajo" en números puros.
 *   **Salud:** Rellenar un dato de presión arterial faltante usando la edad y peso del paciente.
 
-### T. Transformación de Variables (Box-Cox & Scaling)
+### V. Transformación de Variables (Box-Cox & Scaling)
 
 **¿Qué resuelve?**
 Modifica la escala, forma o distribución de los datos para que cumplan con las asunciones teóricas de los algoritmos (como la normalidad o la homocedasticidad).
@@ -537,8 +485,6 @@ Modifica la escala, forma o distribución de los datos para que cumplan con las 
 **Definición Técnica:**
 *   **Estandarización (Z-Score):** $z = \frac{x - \mu}{\sigma}$. Re-csala los datos para tener media 0 y desviación estándar 1. Vital para algoritmos basados en distancia (K-Means, SVM).
 *   **Transformación Box-Cox:** Familia de transformaciones de potencia $y(\lambda)$ parametrizadas por $\lambda$ diseñadas para estabilizar la varianza y hacer que los datos se aproximen a una distribución Normal Gaussiana.
-
----
 
 ---
 
