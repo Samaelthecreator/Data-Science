@@ -1,128 +1,115 @@
-# Fundamentos de Cálculo Estocástico y Series Temporales
+# Fundamentos de Procesos Estocásticos y Series Temporales
 
-> **Nota del Revisor (Albert):** Este documento ha sido reestructurado para cumplir con estándares de rigor académico. Se asume familiaridad con Teoría de la Medida y Análisis Real.
-
-## 1. Definición Axiomática de Procesos Estocásticos
-
-Un **proceso estocástico** no es simplemente una "colección de variables". Es un objeto matemático definido sobre un espacio de probabilidad.
-
-### 1.1 Espacio de Probabilidad Filtrado
-Sea $(\Omega, \mathcal{F}, \mathbb{P})$ un espacio de probabilidad, donde:
-*   $\Omega$: Espacio muestral (conjunto de todos los posibles resultados).
-*   $\mathcal{F}$: Una $\sigma$-álgebra sobre $\Omega$ (conjunto de eventos medibles).
-*   $\mathbb{P}$: Una medida de probabilidad $\mathbb{P}: \mathcal{F} \to [0, 1]$.
-
-Un proceso estocástico $X = \{X_t : t \in T\}$ es una colección de variables aleatorias definidas en $\Omega$ con valores en un espacio de estados $S$ (usualmente $\mathbb{R}^d$).
-
-### 1.2 Filtración y Flujo de Información
-Para modelar la "información disponible hasta el tiempo $t$", introducimos el concepto de **filtración** $\{\mathcal{F}_t\}_{t \in T}$.
-*   Es una familia creciente de sub-$\sigma$-álgebras: $\mathcal{F}_s \subseteq \mathcal{F}_t \subseteq \mathcal{F}$ para todo $s \le t$.
-*   Decimos que el proceso $X$ es **adaptado** a la filtración si $X_t$ es $\mathcal{F}_t$-medible para todo $t$.
-*   Interpretación: En el tiempo $t$, conocemos el valor de $X_t$, pero el futuro $X_{t+h}$ es incierto (una variable aleatoria no constante respecto a $\mathcal{F}_t$).
+> **Autor:** Albert (PhD)
+> **Enfoque:** Rigor Matemático con Intuición Física
+> **Objetivo:** Explicar la mecánica interna de los fenómenos aleatorios temporales para una audiencia general.
 
 ---
 
-## 2. Clasificación Temporal
+## 1. El Quiebre con la Estadística Clásica: ¿Por qué necesitamos una nueva teoría?
 
-### 2.1 Series de Tiempo (Tiempo Discreto)
-Aquí $T = \mathbb{Z}$ o $T = \mathbb{N}$.
-Una serie de tiempo se denota como $\{X_t\}_{t \in \mathbb{Z}}$.
-*   **Ejemplos:** Cadenas de Markov en tiempo discreto, procesos ARMA, GARCH.
-*   **Operador de Retardo (Lag Operator):** $L X_t = X_{t-1}$. Fundamental para representar ecuaciones en diferencias estocásticas:
-    $$A(L)X_t = B(L)\varepsilon_t$$
+La estadística clásica (como calcular el promedio de altura de un grupo) asume que cada dato es una isla independiente. En el mundo real, los datos son una cadena.
 
-### 2.2 Procesos en Tiempo Continuo
-Aquí $T = [0, \infty)$ o $T = \mathbb{R}$.
-*   **Ejemplos:** Movimiento Browniano (Proceso de Wiener), Procesos de Poisson, Difusiones de Itô.
-*   **Regularidad de Trayectorias:** Conceptos como continuidad, diferenciabilidad y variación acotada son críticos.
-    *   *Nota:* Las trayectorias del Movimiento Browniano son continuas en casi todas partes, pero no diferenciables en ninguna parte.
+**El Problema del Tiempo:**
+Imagina que mides la temperatura cada hora. El dato de las 10:00 AM ($X_t$) está fuertemente "amarrado" al de las 9:00 AM ($X_{t-1}$).
+*   **Estadística Clásica:** Asume que el orden no importa (barajar los datos no cambia el promedio).
+*   **Procesos Estocásticos:** El orden *es* la información. Si barajas una canción (serie de tiempo de audio), se convierte en ruido. La estructura está en la secuencia.
 
 ---
 
-## 3. Estacionariedad y Dependencia
+## 2. Definición Formal y Caracterización
 
-La noción intuitiva de "estabilidad" se formaliza mediante dos conceptos distintos.
+### 2.1 El Escenario Matemático (Espacio de Probabilidad)
 
-### 3.1 Estacionariedad Fuerte (Strict-Sense Stationarity)
-El proceso $\{X_t\}$ es estrictamente estacionario si la distribución conjunta de $(X_{t_1}, \dots, X_{t_k})$ es idéntica a la de $(X_{t_1+h}, \dots, X_{t_k+h})$ para cualquier $h$ y cualquier conjunto finito de índices.
-*   Impacto: Toda la estructura probabilística es invariante ante traslaciones temporales.
+Para modelar la incertidumbre, necesitamos un escenario bien definido: $(\Omega, \mathcal{F}, \mathbb{P})$.
 
-### 3.2 Estacionariedad Débil (Covariance Stationarity)
-Es la condición estándar en análisis de series temporales (e.g., Box-Jenkins). Requiere:
-1.  Existencia de momentos de segundo orden: $\mathbb{E}[X_t^2] < \infty$.
-2.  Media constante: $\mathbb{E}[X_t] = \mu$ para todo $t$.
-3.  Autocovarianza dependiente solo del rezago (lag):
-    $$Cov(X_t, X_{t+h}) = \gamma(h)$$
+1.  **Espacio Muestral ($\Omega$ - El Multiverso):** Es el conjunto de *todas* las historias posibles que podrían haber ocurrido desde el inicio de los tiempos.
+2.  **Eventos ($\mathcal{F}$):** Las preguntas de Sí/No que podemos responder (ej. "¿Subió la bolsa hoy?").
+3.  **Medida de Probabilidad ($\mathbb{P}$):** Es una función que asigna un peso a cada evento, $\mathbb{P}: \mathcal{F} \to [0, 1]$. Nos dice qué tan probable es que ocurra un escenario.
+    *   *Debe cumplir:* $\mathbb{P}(\Omega)=1$ (algo tiene que pasar) y ser aditiva para eventos disjuntos.
 
-**Función de Autocorrelación (ACF):**
-$$\rho(h) = \frac{\gamma(h)}{\gamma(0)}$$
+**¿Qué es una Realización?**
+Un proceso estocástico es un abanico de infinitos futuros posibles. Pero nosotros solo vivimos en *uno*. La **Realización** es ese único camino histórico que observamos (los datos que tienes en tu Excel).
+*   *Importancia:* La dificultad de la estadística radica en intentar entender el funcionamiento de todo el "abanico" (el proceso generador) viendo solo "una varilla" de él (la realización).
 
-> **¡Atención!** Un proceso puede ser débilmente estacionario pero no estrictamente estacionario (ej. procesos con momentos superiores cambiantes). Inversamente, un proceso estrictamente estacionario sin segundo momento finito (ej. distribución de Cauchy) no es débilmente estacionario.
+### 2.2 Anatomía de la Serie (Componentes)
 
----
+Al igual que un prisma descompone la luz, la matemática descompone una serie temporal ($X_t$).
 
-## 4. Ruido Blanco y Martingalas
+$$X_t = \text{Estructura Predecible} (T_t, S_t, C_t) + \text{Incertidumbre} (\varepsilon_t)$$
 
-Es crucial distinguir entre tipos de independencia y "falta de memoria".
+1.  **Tendencia ($T_t$):** La dirección a largo plazo.
+2.  **Estacionalidad ($S_t$):** Patrones fijos (reloj).
+3.  **Ciclo ($C_t$):** Olas de fondo (economía).
+4.  **Ruido / Componente Irregular ($\varepsilon_t$):**
+    *   **¿Cómo se detecta?** Es el residuo. Si restas la tendencia y la estacionalidad a tus datos, lo que queda debería ser "basura aleatoria" sin patrón. Si ves patrones en el residuo, tu modelo está incompleto.
 
-### 4.1 Ruido Blanco (White Noise)
-Un proceso $\{\varepsilon_t\}$ es Ruido Blanco (WN) si:
-1.  $\mathbb{E}[\varepsilon_t] = 0$.
-2.  $Var(\varepsilon_t) = \sigma^2 < \infty$.
-3.  $\gamma(h) = 0$ para todo $h \neq 0$ (incorrelación).
-
-*   **Ruido Blanco Gaussiano:** Si además $\varepsilon_t \sim \mathcal{N}(0, \sigma^2)$.
-*   **Ruido Blanco IID:** Si las variables son independientes e idénticamente distribuidas. (Condición más fuerte que la incorrelación).
-
-### 4.2 Martingalas y Diferencias de Martingala
-Una martingala es un proceso $\{M_t\}$ adaptado tal que $\mathbb{E}[|M_t|] < \infty$ y:
-$$\mathbb{E}[M_{t+1} | \mathcal{F}_t] = M_t$$
-Es el modelo matemático de un "juego justo". El mejor pronóstico de mañana es el valor de hoy.
-
-Una **Diferencia de Martingala (MDS)** es un proceso $\{X_t\}$ tal que $\mathbb{E}[X_t | \mathcal{F}_{t-1}] = 0$.
-*   Todo MDS no correlacionada es Ruido Blanco, pero esto permite heterocedasticidad condicional (volatilidad cambiante), base de los modelos **ARCH/GARCH**.
+**La Descomposición de Wold (El Teorema Fundamental):**
+Este teorema nos dice que *cualquier* proceso estacionario (sin tendencia explosiva) se puede ver como ecos de choques pasados.
+*   *Ejemplo Matemático:* Imagina un proceso AR(1) donde hoy es la mitad de ayer más un choque: $X_t = 0.5 X_{t-1} + \varepsilon_t$.
+*   *Descomposición:* Si sustituimos hacia atrás recursivamente:
+    $$ X_t = \varepsilon_t + 0.5 \varepsilon_{t-1} + 0.25 \varepsilon_{t-2} + 0.125 \varepsilon_{t-3} + \dots $$
+    **Interpretación Física:** El valor de hoy es la suma del choque de hoy, más el eco del choque de ayer (atenuado a la mitad), más el eco de antier (un cuarto)... El presente es la suma ponderada de toda la historia de "sorpresas".
 
 ---
 
-## 5. Transformaciones y Operadores
+## 3. Transformaciones: Herramientas de Modelado
 
-### 5.1 Diferenciación ($\Delta$)
-Usada para liminar tendencias estocásticas (raíces unitarias).
-$$\Delta X_t = (1-L)X_t = X_t - X_{t-1}$$
-Si un proceso requiere $d$ diferenciaciones para volverse estacionario, decimos que es Integrado de orden $d$, denotado $I(d)$.
+Antes de predecir, necesitamos "limpiar" la serie para que se comporte bien matemáticamente.
 
-### 5.2 Suavizado Exponencial (Enfoque Espacio-Estado)
-Más allá de fórmulas heurísticas, el suavizado exponencial simple corresponde a un modelo ARIMA(0,1,1) o a un modelo de Espacio de Estados de "Innovaciones Múltiples" con componentes no observables (Nivel local).
+### 3.1 Estabilización de Varianza (Homocedasticidad)
 
----
+**Homocedasticidad** significa "igual dispersión". Queremos que el error de nuestra predicción sea igual de grande hoy que dentro de 10 años.
+Si la serie es volátil (se mueve poco cuando $X$ es pequeño, y muchísimo cuando $X$ es grande), no es homocedástica.
 
-## 6. Modelos Lineales Clásicos (Enfoque Wold)
+*   **Transformaciones:**
+    *   **Logaritmo ($\ln X_t$):** La más común. Comprime los valores altos. Útil cuando la volatilidad es proporcional al nivel (crecimiento porcentual).
+    *   **Box-Cox:** Una familia de transformaciones (raíz cuadrada, inverso, log) que busca automáticamente la mejor función para estabilizar la varianza.
 
-El **Teorema de Descomposición de Wold** establece que todo proceso estacionario de covarianza puramente no determinista puede escribirse como una suma infinita de ruidos blancos pasados:
-$$X_t = \sum_{j=0}^{\infty} \psi_j \varepsilon_{t-j}$$
-donde $\sum \psi_j^2 < \infty$.
+### 3.2 Estabilización de la Media (Diferenciación)
 
-### Modelos ARMA(p, q)
-Aproximaciones racionales de parsimonia finita para la descomposición de Wold.
-$$ \phi(L) X_t = \theta(L) \varepsilon_t $$
-*   **Estacionariedad:** Requiere que las raíces del polinomio autorregresivo $\phi(z) = 0$ yazcan fuera del círculo unitario.
-*   **Invertibilidad:** Requiere que las raíces de $\theta(z) = 0$ yazcan fuera del círculo unitario (permite expresar el ruido como función del pasado observado).
+Si la serie crece siempre (tiene tendencia), la media no es constante.
+*   **Diferenciación ($\Delta X_t = X_t - X_{t-1}$):** En lugar de modelar el *precio* del dólar (que cambia siempre), modelamos el *cambio* en el precio (que oscila alrededor de cero).
+    *   *¿Es el único método?* No. Puedes usar regresión para restar la tendencia ("Detrending"), pero la diferenciación es más robusta para tendencias estocásticas.
+    *   *¿Se pierde información?* **Sí, se pierde el "Nivel".** Al diferenciar, sabes que subió $1 peso, pero olvidas si subió de $10 a $11 o de $1000 a $1001. Para recuperar el pronóstico original, debes "deshacer" la resta (integrar) sumando acumulativamente.
 
 ---
 
-## 7. Métricas de Validación (Critique)
+## 4. Modelos Predictivos e Intuición Física
 
-Evitar el uso ciego de métricas. Seleccionar según la función de pérdida del problema.
+### 4.1 Ruido Blanco (La Materia Prima)
+Físicamente, el **Ruido Blanco** es **Información Pura** o "Sorpresa".
+*   Si pudieras predecir el ruido, ya no sería ruido, sería un patrón.
+*   Se llama "Blanco" por analogía con la luz blanca: contiene "todas las frecuencias" con igual intensidad. No suena agudo ni grave, suena a estática.
+*   En modelos, es la fuente de energía que mantiene vivo al sistema. Sin ruido, el sistema se detendría en un punto fijo.
 
-*   **MSE (Mean Squared Error):** Minimizado por la esperanza condicional $\mathbb{E}[X_{t+h}|\mathcal{F}_t]$. Penaliza fuertemente grandes errores.
-*   **MAE (Mean Absolute Error):** Minimizado por la mediana condicional. Robustez ante outliers.
-*   **Criterios de Información (AIC, BIC):**
-    $$AIC = -2 \ln(\mathcal{L}) + 2k$$
-    No son pruebas de hipótesis. Estiman la Divergencia de Kullback-Leibler entre el modelo y la verdad generadora de datos. El BIC es consistente (encuentra el modelo verdadero si $n \to \infty$), el AIC es eficiente (minimiza el error de predicción).
+### 4.2 Modelos AR (Inercia) y Parámetro $p$
+$$ AR(p): X_t = \phi_1 X_{t-1} + \dots + \phi_p X_{t-p} + \varepsilon_t $$
+*   **Intuición:** Inercia o Memoria.
+*   **Parámetro $p$ (Orden):** Nos dice **"¿Qué tan profunda es la memoria?"**.
+    *   $p=1$: Solo me importa ayer.
+    *   $p=12$: Me importa lo que pasó hace un año (mensual).
+*   **Importancia:** Modelan sistemas que se resisten al cambio rápido (como la temperatura de un horno).
+*   **Condición:** Deben ser estables. Si $\phi > 1$, el sistema explota (efecto bola de nieve).
+
+### 4.3 Modelos MA (Impacto) y Parámetro $q$
+$$ MA(q): X_t = \varepsilon_t + \theta_1 \varepsilon_{t-1} + \dots + \theta_q \varepsilon_{t-q} $$
+*   **Choque ($\varepsilon_t$):** Es un evento externo repentino. Una noticia de última hora, un terremoto, una orden de compra grande.
+*   **Interpretación:** El valor de hoy depende del choque de hoy y de los "ecos" de los choques pasados.
+*   **Parámetro $q$ (Orden):** Nos dice **"¿Cuánto tiempo resuena el eco?"**.
+    *   $q=0$: El choque desaparece instantáneamente (Mercado ultra-eficiente).
+    *   $q=3$: Una noticia afecta el mercado hoy, y sigue teniendo réplicas por 3 periodos más.
+
+### 4.4 ARIMA
+Une ambos mundos:
+1.  **I(d):** Primero estabilizamos el nivel (diferenciando $d$ veces).
+2.  **AR(p):** Modelamos la inercia interna del sistema.
+3.  **MA(q):** Modelamos cómo el sistema absorbe los golpes externos.
 
 ---
 
-## Bibliografía Recomendada
-1.  **Hamilton, J. D.** (1994). *Time Series Analysis*. Princeton University Press. (La referencia canónica).
-2.  **Brockwell, P. J., & Davis, R. A.** (1991). *Time Series: Theory and Methods*. Springer. (Rigor matemático alto).
-3.  **Øksendal, B.** (2003). *Stochastic Differential Equations*. Springer. (Introducción estándar a procesos continuos).
+## 5. Glosario de Términos
+
+*   **Estacionariedad:** Equilibrio estadístico. Las reglas del juego (media, varianza) no cambian con el tiempo, aunque la pelota se mueva.
+*   **Proceso Estocástico:** Una colección de variables aleatorias ordenadas en el tiempo. Una partitura musical donde las notas se eligen tirando dados.
+*   **Raíz Unitaria:** Cuando un proceso tiene memoria perfecta. Un choque ocurrido hace 100 años sigue afectando el nivel de hoy. (Requiere diferenciación).
