@@ -18,12 +18,11 @@ Datos clásicos:
         - Nominales: Etiquetas sin orden.
             Ejemplo: colores, generos, etc.
         - Ordinales: Categorias con orden lógico (sin distancia medible).
-    Área 
+    Área fundamental: Teoría del orden parcial, relaciones binarias
 Tambien existen los tipos:
     - De invervalo: Diferencias significativas, sin un cero absoluto 
         Ejemplo: temperaturas en celsius
     - De razón: Poseen un cero absoluto que indica ausencia del atributo.
-    Área fundamental: Teoría del orden parcial, relaciones binarias
 
 ### Datos poco convencionales.
 
