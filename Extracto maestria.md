@@ -2076,19 +2076,729 @@ a_ij=P[q_(t+1) =S_j -| q_t=S_i], donde 1≤i, j≤N
 observación en el estado j.
 b_j (k)=P [v_k en t-| q_t=S_j], donde 1≤i, j≤N y 1≤k≤M
 • La distribución del estado inicial:
-π_i=P [q_1=S_i], donde 1≤i≤N
+    π_i=P [q_1=S_i], donde 1≤i≤N
 
-Las características anteriores se pueden emplear como
-generador para obtener una secuencia de observaciones
-O = O_1, … O_t de la siguiente forma:
-1. Seleccionar un estado inicial q_1 = S_i de acuerdo
-con la distribución del estado inicial π.
-2. Marcar el instante t = 1.
-3. Elegir la observación O_t = V_k según la distribución
-de probabilidad de los símbolos en el estado S_i.
-4. Pasar a un nuevo estado q_(t+1) = S_j empleando la
-distribución de probabilidad para la transición entre
-los estados.
-5. Aumentar el valor de t y volver al paso 3, en el caso
-de que t no sea menor que T, en caso contrario
-terminar el proceso.
+    Las características anteriores se pueden emplear como
+    generador para obtener una secuencia de observaciones
+    O = O_1, … O_t de la siguiente forma:
+    1. Seleccionar un estado inicial q_1 = S_i de acuerdo
+    con la distribución del estado inicial π.
+    2. Marcar el instante t = 1.
+    3. Elegir la observación O_t = V_k según la distribución
+    de probabilidad de los símbolos en el estado S_i.
+    4. Pasar a un nuevo estado q_(t+1) = S_j empleando la
+    distribución de probabilidad para la transición entre
+    los estados.
+    5. Aumentar el valor de t y volver al paso 3, en el caso
+    de que t no sea menor que T, en caso contrario
+    terminar el proceso.
+
+
+
+    -------------16/02/2026-----------------------//////////////////////////////////////////////////////////////////
+
+
+    Tema 9:
+    Redes neuronales
+
+
+
+    Aprendizaje automático con redes neuronales artificiales.
+
+    Perceptrón multicapa:
+
+    Las redes neuronales son potentes modelos de clasificación capaces de aprender límites de decisión complejos y no lineales a partir de los datos.
+
+    Historia:
+    El neuropsicólogo Donald O. Hebb en 1948
+    estableció las bases del aprendizaje mediante
+    neuronas con la famosa regla de Hebb.
+
+Perceptron:
+Es un tipo básico de red neuronal que está formado por nodos de entrada, empleados para representar los atributos de entrada, y un nodo de salida, para representar la salida del modelo.
+
+El nodo de salida es una función matemática
+que calcula la suma ponderada de las entradas,
+añade un factor de sesgo a la suma y para
+finalizar, examina el signo del resultado para
+producir la salida. Esta función que examina el
+signo se denomina función de activación.
+
+El perceptrón multicapa o red neuronal multicapa
+generaliza el concepto básico de perceptrón con
+una arquitectura más complejas de nodos que son
+capaces de aprender límites de decisión no lineales
+
+El perceptrón multicapa está formado por una capa
+de entrada, empleada para representar los atributos
+de entrada. Los atributos numéricos o binarios se
+suelen representar mediante un único nodo, mientras
+que los categóricos son representados por un nodo
+diferente para cada valor.
+
+Las entradas se introducen en las capas
+intermedias denominadas capas ocultas, que
+están formadas por unidades de procesamiento
+llamadas nodos ocultos. Cada uno de los nodos
+ocultos opera sobre los valores recibidos de la
+capa de entrada o de los nodos ocultos de la capa
+anterior, y produce un valor de activación que se
+pasa a la capa siguiente.
+La última capa, corresponde a la capa de salida y
+procesa los valores de la capa oculta anterior para
+producir las predicciones. En clasificación binaria la
+capa de salida tiene un único nodo que representa
+la etiqueta de clase.
+Este tipo de redes también se denomina
+feedforward
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Donde w k es el peso asociado al i-ésimo enlace
+después de la k-esima iteración. El valor α es
+la tasa de aprendizaje cuyo valor está entre 0
+y 1, y se emplea para controlar la cantidad de
+ajuste que se hace en cada iteración. Si el valor
+de λ es muy bajo aprende muy lentamente y
+si es muy alto no es capaz de generalizar. Y x ij
+es el valor del j-ésimo atributo del ejemplo de
+entrenamiento xi.
+
+6. Se actualiza el valor de k. k = k +1
+7. Se vuelve al paso cuatro o se finaliza si la media
+entre la diferencia del valor de la salida real y el
+predicho es menor que un umbral.
+El principal problema del perceptrón es que no
+puede encontrar una solución si las clases no
+son linealmente separables.
+Una de las diferencias principales entre el
+perceptrón simple y el multicapa es que este
+último puede resolver problemas que no son
+linealmente separables, y esto es gracias
+a las capas ocultas. Estos nodos ocultos
+pueden considerarse como el aprendizaje de
+características para distinguir entre las clases
+de salida. Los perceptrones multicapa aprenden
+una jerarquía de características a diferentes
+niveles de abstracción que finalmente se
+combinan en los nodos de salida para hacer las
+predicciones [3].
+A lo largo de esta sección se ha descrito el
+proceso de aprendizaje de un perceptrón para
+problemas de clasificación, pero las redes
+neuronales también se pueden emplear para
+problemas de regresión.
+
+El principal problema del perceptrón es que no
+puede encontrar una solución si las clases no
+son linealmente separables.
+
+
+Una de las diferencias principales entre el
+perceptrón simple y el multicapa es que este
+último puede resolver problemas que no son
+linealmente separables, y esto es gracias
+a las capas ocultas.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Para abordar esta problemática en el
+año 1986 se desarrolló una técnica conocida como
+backpropagation [2] que propaga las derivadas
+parciales hacía atrás, es decir, desde la capa de
+salida hasta las capas ocultas.
+
+• Backpropagation
+La técnica de backpropagation pretende
+minimizar la función de coste ajustando los pesos
+y los sesgos de la red. Y ese nivel de ajuste viene
+determinado por el descenso del gradiente que
+involucra el coste con respecto a los parámetros.
+El funcionamiento de una red neuronal de
+tipo feedforward empleando la técnica de
+retropropagación se puede describir de la siguiente
+forma [4]:
+1. Se inicializan los pesos y el sesgo de forma
+aleatoria, normalmente siguiendo una
+distribución normal.
+2. El segundo paso consiste en propagar hacia
+adelante. Primero cada atributo de entrada
+pasa por la capa de entrada sin sufrir alteración
+alguna. A continuación, se calcula la entrada de
+la capa oculta empleando la siguiente ecuación:
+
+z i ,k= wT xij + b
+
+
+Backpropagation: el error se propaga hacia
+atrás actualizando los pesos y los sesgos
+para reflejar el error de la predicción de la red.
+Para la capa de salida el error se calcula con la
+función de coste y se retropropaga hacia atrás
+empleando el descenso del gradiente. Mediante
+la regla de la cadena se pueden representar las
+derivadas parciales con respecto a w I
+ij de la
+siguiente forma [3]:
+La ecuación puede simplificarse de la siguiente
+manera:
+Por tanto, para calcular las derivadas parciales
+solo se necesita determinar δi
+l. La resolución
+de esta fórmula cambiará dependiendo de la
+función de pérdida empleada. Por lo que yendo
+hacia atrás desde la capa de salida L hasta
+las capas ocultas aplicando recursivamente la
+ecuación anterior para cada nodo oculto para
+calcular las derivadas parciales de la función de
+pérdida con respecto a los pesos wI
+ij y el sesgo
+b i , se consigue minimizar el error.
+4. Condición de finalización: existen varias
+condiciones de finalización:
+A. Que los parámetros converjan.
+B. Que se alcance el número máximo de épocas
+(número de ciclos de ejecución de la red
+neuronal).
+C. Que el porcentaje de ejemplos mal
+clasificados esté por debajo de un umbral.
+
+
+
+
+• Funciones de activación
+La función de activación es una de las partes más
+importantes de las redes neuronales ya que define
+la salida de la red neuronal. Y no solo de la neurona
+de la última capa, sino también de las neuronas
+de las capas ocultas. El objetivo de la función de
+activación es asignar valores entre 0 y 1, o -1 y 1,
+etcétera, dependiendo del tipo de función.
+La salida de la función de activación hacia la
+siguiente capa de la red se denomina propagación
+hacia adelante.
+
+
+6Redes neuronales |
+Existen diferentes tipos de funciones de activación
+y básicamente se dividen en dos tipos:
+- Funciones de activación lineales: cuya salida es
+una línea recta lo que implica que el resultado no
+estará acotado a ningún rango. La fórmula es la
+siguiente:
+Donde b es el sesgo.
+- Funciones de activación no lineales: son las más
+usadas. La no linealidad de estas funciones facilita
+que el modelo se adapte a una gran variedad
+de datos. Algunas funciones de activación no
+lineales son las siguientes:
+» Función sigmoidal:
+Funcion de tangente hiperbólica
+Función de ReLu (Rectified Linear Unit)
+
+Redes Feedforward
+Tema 10:
+Aprendizaje profundo
+
+
+Redes feedforward profundas:
+El uso de capas ocultas en las redes neuronales se basa en la afirmación de que las características mas complejas de alto nivel pueden constituirse combinando caracteristicas más simples de nivel inferior.
+Generalmente, cuanto mayor sea el número de capas ocultas, mayor será la jerarquía de características aprendidas por la red.
+
+Las redes profundas de tipo feedforward, o
+perceptrones multicapa, son los modelos de
+aprendizaje profundo por excelencia.
+
+
+Y cuando las redes de tipo feedforward se amplían para incluir conexión de retroalimentación se denominan redes neuronales recurrentes.
+
+El hecho de que
+se denominen capas ocultas es porque la salida de
+esta no es la solución deseada. La dimensión de
+las capas ocultas determina el tamaño del modelo.
+
+se han experimentado pequeños
+cambios a nivel de algoritmo que han mejorado el
+rendimiento de las redes tipo feedforward, como,
+por ejemplo:
+- El cambio de la función de coste del error
+cuadrático medio a la familia de funciones de
+pérdida de entropía cruzada mejoró el rendimiento
+de los modelos con funciones sigmoidales o de
+tipo softmax en la capa de salida.
+- El empleo en las capas ocultas de la función de
+activación Rectified Linear Unit (ReLU) en lugar
+de la función sigmoidal mejoró en gran medida el
+rendimiento de la red.
+
+Redes neuronales convolucionales y modelos de secuencia
+Estas son un
+tipo especializado de red neuronal para procesar datos
+con una topología conocida, como las imágenes. El
+nombre de red convolucional viene dado porque implica
+una operación matemática llamada convolución
+
+
+Estas son un
+tipo especializado de red neuronal para procesar datos
+con una topología conocida, como las imágenes. El
+nombre de red convolucional viene dado porque implica
+una operación matemática llamada convolución
+
+
+• Pooling
+La función de pooling o agrupación modifica la
+salida de la capa. Esta función sustituye la salida
+de la red en un lugar determinado por un resumen
+estadístico de las salidas cercanas, es decir,
+reduce el tamaño de los mapas de características
+utilizando alguna función para resumir las
+subregiones.
+
+Existen varias funciones de pooling,
+como el max pooling, que extrae la salida máxima
+de una región del mapa de características. Otras
+funciones de pooling famosas son average of
+a rectangular neighborhood, la norma L2 de un
+vecino rectangular, o la media ponderada basada
+en la distancia desde el píxel central 
+
+
+Capa de clasificación:
+El funcionamiento es el siguiente: se aplana el
+mapa de salida en un vector que se emplea para
+alimentar a estas capas totalmente conectadas,
+se propaga el resultado hacia adelante y se
+aplica el backpropagation en cada iteración de
+entrenamiento.
+
+
+		Modulo 9
+Arquitecturas y sistemas para uso intensivo de datos
+
+Los requisitos principales para los sistemas serán fiabilidad, adaptabilidad (escabilidad) y mantenibilidad.
+
+Gartner (2000) señaló una necesidad de crecimiento en volumen y variedad y velocidad
+
+Las herramientas que se fueron creando fueron como por ejemplo: sistemas de log como kafka - Gestión de colas de mensajes con garantias de durabilidad similar a las bases de datos.
+Las tres caracteristicas son:
+
+• Fiabilidad/confiablilidad: capacidad de un sistema para continuar
+funcionando correctamente a pesar de posibles
+defectos.
+incluye que la aplicación realice la acción que espera el usuario en un tiempo determinado bajo unas condiciones de Carga determinadas¨
+El sistema debe de tener un mecanismo de autorización o seguridad para que determinadas acciones no puedan ser llevadas a cabo por personal sin autorización.
+Se suele esperar que el sistema siga funcionando correctamente
+incluso cuando el usuario no sigue el camino diseñado
+No comete errores. Estos sistemas se etiquetan como
+resilientes o tolerantes a fallos.
+
+
+• Adaptabilidad / Escalabilidad: capacidad de un
+sistema de hacer frente a una mayor demanda, bien
+en términos de tráfico, de volumen de datos o de
+complejidad.
+cada sistema deberá describir sus parámetros de carga, es decir, aquellos aspectos relevantes para su sistema. Una vez elegidos los parámetros de carga del sistema es
+necesario conocer los valores de los mismos: número de
+peticiones atendidas por segundo, tiempo de respuesta
+ante una petición, tiempo de procesamiento, etc. Estos
+valores constituyen el rendimiento del sistema y es
+interesante conocer la respuesta de la aplicación ante
+aumentos de carga, así como las necesidades de recursos
+para mantener el rendimiento ante esos aumentos.
+Generalmente los parámetros de carga se utilizan distribución de valores.
+Estos suelen recogerse en gráficos de dispersión o en histogramas con indicadores de percentil.
+Estos indicadores son especialmente útiles porque
+muestran los valores representativos del rendimiento
+del sistema (valor más frecuente) o casos extremos
+(percentiles altos, 95, 99, 99.9 %)
+
+Tipos de escalabilidades:
+• Escalado vertical (aumentar el potencial de las
+máquinas existentes).
+• Escalado horizontal (distribuir la carga entre más
+máquinas)
+
+
+
+• Mantenibilidad: capacidad de un sistema para
+continuar evolucionando por aquellos que
+empezaron el desarrollo o por personas diferentes
+de manera productiva.
+
+ la adaptación del sistema a nuevos entornos, existen tres principios de mantenibilidad:
+
+1. Operabilidad: cualidad de que un sistema pueda
+ser mantenido en ejecución sin problemas.
+2. Simplicidad: cualidad de que un sistema sea
+fácilmente comprensible por nuevos ingenieros.
+3. Evolucionabilidad: cualidad de que un sistema sea
+fácilmente extensible o que su comportamiento
+pueda ser modificado.
+
+Es común en la gestión de sistemas que exista un
+equipo dedicado a que el software siga en ejecución
+de forma adecuada en producción. 
+
+la configurabilidad
+del sistema, facilitando un comportamiento por defecto,
+pero dando la posibilidad que éste sea sobreescrito
+cuando sea necesario. Eliminar dependencias con
+valores estáticos o acciones pensando en una máquina
+concreta.
+
+el 75 % del coste total de propiedad del
+software está relacionado con el mantenimiento
+
+
+
+
+
+
+HINTS: Ingenieria de caos, la verificación de nueva funcionalidad de
+forma acotada como blue-green deployment o canary
+release, amplificación de latencia de cola, Behaviour Driven Development (BDD), refactoring.
+
+Tipos de fallos:
+Software
+Hardware
+Humanos
+
+**Simplicity is a prerequisite for reliability. - Edsger W. Dijkstra** -> La sencillez de un sistema no implica que el conjunto de funcionalidades que ofrezca el mismo sea pobre, sino que el sistema solo tenga la complejidad inherente al problema y no sea la implementación de la solución la que añada complejidad al sistema
+
+
+PARAMETROS DE RENDIMIENTO.
+
+
+
+
+
+
+
+Tema 2: Modelado de datos
+
+
+Modelos de datos:
+Las abstracciones son una de las herramientas más importantes a la hora de luchar contra la complejidad de un sistema.
+
+Modelo relacional:
+
+Bases de datos jerarquicas: La información se almacena en una estructura de árbol, donde un nodo padre puede tener varios hijos. Posiblemente, la versión mas conocida es la IMS (1968), El IMS utiliza el lenguaje de consultas DL/1 y es posible
+gracias al modelo jerárquico.
+cada registro tiene una clave de secuencia jerárquica (HSK, por sus
+siglas en inglés). Esta clave se calcula concatenando
+las claves de los ancestros a la clave del registro actual,
+permitiendo que estén ordenados en profundidad.
+
+El IMS ofrecía soporte para cuatro formatos de
+almacenamiento diferentes. Los registros raíz pueden
+ser almacenados secuencialmente, indexados
+mediante un árbol B usando la clave del registro, o
+en una tabla hash mediante la clave del registro. Los
+registros descendientes pueden ser encontrados
+bien colocados físicamente en secuencia o utilizando
+diferentes formas de punteros.
+
+
+
+1. Obliga a que el modelado de una solución incurra
+en redundancia de datos. Las relaciones obligan a
+que la información en los hijos deba ser repetida
+para permitir representar esa misma información
+con otro nodo padre. Esta circunstancia abre la
+puerta a problemas de inconsistencia de datos, por
+ejemplo, si solo se actualizan ciertos registros de
+los registros duplicados.
+
+2. Un nodo hijo solo puede existir si existe el padre.
+En una estructura de árbol se está obligado a que
+una entidad esté relacionada con otra para existir.
+
+
+
+Bases de datos de red
+
+En 1969 el comité committee on data systems
+languages (CODASYL) liberó una especificación
+para un nuevo modelo de datos de red. Este modelo
+organizaba los registros utilizando claves en forma de
+red, en lugar de en árbol.
+
+
+Un registro de tipo propietario tiene una relación con
+registro de tipo hijo mediante un arco con nombre
+que en Codasyl se llamaba set. En Codasyl, existe una
+relación 1-n entre las instancias de tipo propietario y las
+instancias de tipo hijo. Una base de datos Codasyl es
+aquella que tiene instancias set e instancias registro
+con al menos un punto de entrada (un registro que no
+es hijo de ninguno de los otros registros).
+Esta nueva base de datos resolvía muchas de las
+restricciones de un modelo jerárquico, pero seguía
+siendo difícil modelar ciertas situaciones. Por ejemplo,
+una de las limitaciones de este tipo de bases de datos
+es que los arcos o sets, solo podían establecerse entre
+dos registros por lo que representar relaciones entre tres
+elementos obligaba a modelos poco naturales.
+
+el modelo es
+considerablemente más complejo que uno jerárquico,
+
+
+Modelo relacional:
+
+En 1970, Ted Codd propuso el modelo relacional. Su
+motivación radicaba en el gran tiempo de dedicación
+que se empleaban en tareas de mantenimiento al utilizar
+sistemas IMS cuando había cambios físicos o lógicos.
+Su propuesta se basaba en tres aspectos:
+1. Almacenar la información en estructuras de datos
+sencillas (tablas).
+2. Acceso a un conjunto de datos mediante un
+lenguaje de modelado de alto nivel.
+3. No debe ser necesario una propuesta de
+almacenamiento físico.
+
+A mitad de los 70, nacieron dos lenguajes
+de consulta para el modelo relacional, SQL y QUEL
+como versiones mucho más sencillas y amigables de la
+propuesta inicial de Ted Codd. A raíz del éxito de DB/2
+IBM acabó declarando ganador al modelo relacional y
+estableciendo SQL como el lenguaje estándar.
+
+ambién durante la década de los 70 surgió el modelo
+entidad-relación y a finales el semántico. Durante la
+década de los 80 se realizaron ampliaciones al modelo
+relacional y a finales y principios de los 90 nuevos
+modelos como el orientado a objetos y objeto-relacional
+fueron creados.
+
+
+Modelo documental (NoSQL).
+
+tienen que ser pequeñas las estructuras.
+
+Patron subconjunto
+
+
+Una de las ventajas que proporcionan aquellas bases de
+datos con un modelo de documentos (especificado en
+JSON) es la reducción de la adaptación de impedancias
+objeto-relacional [2]. Este concepto hace referencia a la
+necesidad de adaptar, traducir o unir el lenguaje de la
+aplicación al lenguaje de la base de datos y viceversa
+(eliminar esta problemática fue el principal motivo de la
+aparición de las bases de datos orientadas a objetos [3]
+a mediados de 1980).
+
+
+• Relaciones 1 a N
+En el modelo tradicional SQL, la representación
+más común de una relación 1 a n, es la
+representación normalizada, que consiste en que
+aquella entidad que pueda aparecer n veces está
+en una tabla separada y utiliza una referencia
+de clave externa (foreign key) a la otra tabla que
+representa la entidad con cardinalidad 1.
+Las soluciones de documentos pueden
+representar esta relación en un único documento
+JSON, añadiendo un array para cada relación
+1 a N entre la entidad que se está definiendo
+(cardinalidad 1) y los elementos del array
+(cardinalidad N). Esta representación se
+aprovecha de la localidad espacial. Cuando la
+información a obtener requiere tanto la entidad
+como las entidades relacionadas, en un modelo
+relacional es necesario bien utilizar múltiples
+consultas o utilizar operaciones join entre la tabla
+tratada y las subordinadas.
+• Relaciones N a 1 y N a M
+Cuando la relación es inversa, es decir N
+elementos apuntan a otra entidad, se tiene una
+relación N a 1 (por ejemplo, N entidades empleado
+apuntarán a una entidad empleador actual).
+En esta ocasión, utilizar un identificador a otra
+tabla en lugar de directamente el nombre del
+empleador permite una serie de ventajas, tales
+como, la consistencia (eliminando la posibilidad
+de errores ortográficos o diferencias de estilo),
+facilidad de actualizar información del empleador
+(modificando los datos de esa tabla, en lugar de
+modificar la información de cada empleado),
+búsquedas más sencillas, facilidad para traducir
+la información en otros idiomas, etc. Eliminar con
+la duplicación o redundancia de datos es la idea
+de la normalización. Este concepto no encaja con
+el modelo de documentos, pero sí con el modelo
+relacional, donde es común relacionar tablas
+mediante un identificador y luego utilizar joins
+para recabar la información deseada.
+
+
+Actualmente, los mayores argumentos para el
+uso del modelo de documentos son la flexibilidad
+del esquema de la base de datos y el mejor
+rendimiento (principio de localidad espacial). A
+favor del modelo relacional está el soporte para
+representar y obtener información mediante joins
+de relaciones N a 1 y N a M
+
+En una base de datos
+de documentos, simplemente se escribiría con el
+nuevo formato, en una base de datos relacional
+sería necesario modificar el esquema y actualizar
+la información de las tablas, pudiendo incurrir en
+tiempo de inactividad de la base de datos.
+En este aspecto, es necesario entender la
+estructura y los diferentes tipos de objetos que
+tendrá la base de datos. En situaciones donde
+se necesiten numerosos tipos de objetos o la
+estructura de los datos venga determinada por un
+servicio o sistema externo la opción del esquema
+en tiempo de lectura será superior a la de tiempo
+de escritura. Sin embargo, la estructura de los
+datos debe tener la misma estructura y se tiene
+que asegurar que se cumpla, se obtendrá beneficio
+al tener un esquema en tiempo de escritura.
+Otro de los factores a tener en cuenta, es el acceso
+y la actualización de la información. Dado que las
+bases de datos de documentos aprovechan el
+principio de cercanía de referencias, el rendimiento
+será superior cuando la aplicación utilice gran parte
+de la información del documento, ya que este tipo
+de gestores suelen cargar el documento entero
+independientemente de la porción a utilizar por la
+aplicación.
+De este modo, se evitarían las diferentes
+búsquedas necesarias en un modelo relacional
+con varias tablas. En el caso de la actualización de
+información, se serán penalizados al tener mucha
+información agrupada en un documento, a menos
+que el tamaño del documento codificado sea el
+mismo. Por este motivo, se recomiendan crear
+documentos pequeños y aumentar el tamaño de
+los mismos en las escrituras, reduciendo el número
+de casos en el que estas bases de datos son útiles.
+En los últimos años, las bases de datos relacionales
+han añadido soporte para interactuar con XML o
+JSON y las bases de datos de documentos facilitan,
+de diferentes maneras, operaciones joins, haciendo
+que los caminos de ambas se crucen ofreciendo las
+ventajas de un modelo híbrido
+
+Modelo de grafos
+
+Existen diferentes formas de crear o estructurar
+un grafo, así como diferentes maneras de realizar
+consultas. Los dos modelos más relevantes son el
+modelo de grafo de propiedades (property graph) y
+el triple store (también llamado almacén de RDF). El
+gestor de base de datos más conocidos del modelo
+de propiedades es Neo4J y, MarkLogic o AllegroGraph
+son algunas de las que utilizan el modelo triple store.
+También hay gestores que soportan ambos modelos
+como es el caso de Amazon Neptune. Asimismo,
+existen diferentes lenguajes de consulta tales como
+Cypher (lenguaje utilizado en Neo4J), Gremlim (Amazon
+Neptune), SPARQL (GraphDB).
+
+El modelo de grafo de propiedades consiste en que
+cada vértice tiene un identificador único, un conjunto
+de arcos salientes, otro de arcos entrantes y una
+colección de propiedades de tipo clave-valor. Cada
+arco tiene un identificador único, el vértice donde
+comienza el arco, el vértice donde acaba, una etiqueta
+que define el tipo de relación entre dos vértices y una
+colección de propiedades clave-valor.
+En este modelo, cada vértice puede conectarse con
+cualquier otro vértice sin ninguna restricción en cuanto a
+tipos o limitaciones de un esquema (no es necesario la
+homogeneidad de datos de los diferentes vértices). Para
+cada vértice, están disponibles tanto los arcos de entrada
+como de salida por lo que se puede recorrer el grafo en
+cualquier sentido. Además, dado que los arcos tienen
+una etiqueta el modelo es claro y limpio aun teniendo
+diferentes tipos de relaciones entre los vértices. Estas
+propiedades hacen que este modelo sea fácilmente
+extensible, añadiendo relaciones y vértices con información
+de diferente índole a la que ya se tiene. Este es uno de
+los principios, la evolucionabilidad, que se busca para
+conseguir aplicaciones de alta mantenibilidad.
+El modelo triple-store permite representar un grafo al
+igual que el modelo anterior, pero utilizando un modo
+muy particular. En este modelo la información se
+almacena en un triplete, que está compuesto por sujeto-
+predicado-objeto, como «Juan sabe inglés».
+El sujeto de un triplete es equivalente a un vértice en un
+grafo, pudiendo el objeto adoptar dos formas:
+1. Un valor con un tipo de datos primitivo, como un
+número, «Juan pesa 75 kg».
+2. Otro vértice en el grafo. En este caso, el sujeto y el
+objeto son dos vértices y el predicado es un arco del
+grafo. «Juan conoce a María», donde Juan y María
+serían dos vértices y conoce es la etiqueta del arco.
+
+ Modelos de datos |
+El modelo de bases de datos de grafo puede hacer
+recordar al modelo de red (Codasyl) aunque difieren
+significativamente. El modelo Codasyl tenía un
+esquema que indicaba qué tipo de registro podía ser
+asociado con otros tipos, se debía acceder por el punto
+de entrada y los hijos de un registro eran un conjunto
+ordenado (las aplicaciones debían preocuparse por
+mantener ese orden al escribir nuevos registros).
+Como se ha visto, el modelo de grafos no tiene esas
+restricciones permitiendo la conexión de vértices con
+diferente información, pudiendo recorrer el grafo desde
+cualquier vértice. Además, los modelos de grafos
+facilitan lenguajes de consulta declarativos de alto
+nivel, mucho más sencillos que el lenguaje imperativo
+y con dependencia física de Codasyl.
+
+
+
+
+HINTS: bases
+de datos de tipo schema-on-write (aquí estarían
+las relacionales) y schema-on-read (y aquí las
+de documentos), poliglota. 
+
+

@@ -1,4 +1,4 @@
-# Modelos Gráficos Probabilísticos
+# Modelos de Grafos Probabilísticos
 
 Estos modelos combinan la **Teoria de Grafos** con la **Probabilidad** para representar sistemas complejos con incertidumbre. Son la base del razonamiento moderno en IA antes del auge del Deep Learning masivo para datos no estructurados.
 
@@ -10,7 +10,7 @@ Son grafos acíclicos dirigidos (DAGs) donde:
 ### Características
 - Permiten razonar sobre causalidad y diagnóstico (ej. Síntoma $\rightarrow$ Enfermedad).
 - Manejan datos faltantes marginalizando variables.
-- **Inferencia:** Calcular la probabilidad de una variable no observada dada la evidencia ($P(Enfermedad | Fiebre=Alta)$).
+- **Inferencia:** Calcular la probabilidad de una variable no observada dada la evidencia ($P(Enfermedad | Fiebre = Alta)$).
     - *Exacta:* Costosa computacionalmente.
     - *Aproximada:* Métodos como **MCMC (Markov Chain Monte Carlo)**.
 

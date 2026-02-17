@@ -20,6 +20,7 @@ El "Día a día" de un Data Scientist.
 - **EDA (Análisis Exploratorio):** Entender qué dicen tus datos.
 - **Ingeniería de Características:** Transformar datos para que los modelos los entiendan.
 - **Visualización:** Comunicar hallazgos.
+- **Arquitectura y Modelado:** Principios de diseño (Fiabilidad, Escalabilidad) y comparativa de modelos de datos (SQL vs NoSQL vs Grafos).
 
 ## 📂 03_Inteligencia_Artificial
 El núcleo del aprendizaje automático.
