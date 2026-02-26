@@ -2150,31 +2150,7 @@ producir las predicciones. En clasificación binaria la
 capa de salida tiene un único nodo que representa
 la etiqueta de clase.
 Este tipo de redes también se denomina
-feedforward
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+feedforwar
 
 
 
@@ -2226,16 +2202,6 @@ perceptrón simple y el multicapa es que este
 último puede resolver problemas que no son
 linealmente separables, y esto es gracias
 a las capas ocultas.
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -2802,3 +2768,1542 @@ las relacionales) y schema-on-read (y aquí las
 de documentos), poliglota. 
 
 
+  -------------26/02/2026-----------------------//////////////////////////////////////////////////////////////////
+
+Tema 3
+Gestión de almacenamiento y recuperación de datos
+
+Motores de almacenamiento y recuperación de datos.
+
+Se analizarán los motores con estructura de log y los motores de almacenamiento orientado a páginas como los árboles B.
+
+Almacenamiento en LOG e índices HASH.
+
+un log es un archivo donde se escribe de forma secuencial eventos o acciones que afectan a un proceso particular. Un log en el que las operaciones a realizar se van concatenando.
+
+Este va guardando líneas con información en formato clave-valor. Esta información siempre se concatena al final del archivo.
+El rendimiento en la lectura de una clave no será muy bueno, ya que es necesario leer todo el archivo.
+Para mejorar la lectura es utilizar un índice, este es un indicador que permite agilizar las búsquedas de igual manera que las marcas de listado telefónico o un diccionario señaliza puntos de inicio que permiten que las búsquedas sean más rápidas.
+Los indices son metadatos
+La mayoria de las bases de datos permiten añadir y eliminar indices sin afectar el contenido, pero si al rendimiento de las operaciones contra la base de datos.
+Cada ves que se realiza una operación de escritura, será necesario actualizar el índice.
+ Por esta razón, es necesario elegir los índices que mejoren significativamente las consultas, teniendo en cuenta el tiempo de mejora y la cantidad de veces
+que se utilizará ese índice, ya que tienen que compensar que las escrituras se ralentizarán.
+
+Es necesario que todas las claves puedan albergarse en memoria RAM. No es así para los
+valores, ya que una vez que se sabe dónde está almacenado, es una búsqueda directa en el disco duro, que podría ser incluso evitada si esa información está en una caché.
+
+Uno de los problemas del almacenamiento en ficheros
+de log es que los nuevos registros se concatenan al
+final del archivo, en lugar de sobrescribir el valor para
+una determinada clave, por lo que el fichero crece al
+mismo ritmo que sus escrituras. Una solución a este
+problema es realizar segmentación del archivo.
+En lugar
+de escribir siempre en un único archivo, una vez que se
+llega a cierto tamaño, se empieza a escribir en un nuevo
+archivo (este es el comportamiento que utilizan las
+utilidades de logging de lenguajes de programación).
+Una vez los archivos están segmentados se puede
+realizar la compactación. Proceso en el que se dejan
+solo las claves más recientes, eliminando todas las
+claves repetidas. De este modo, el tamaño del archivo
+se reduce proporcionalmente al número de escrituras
+que repiten o actualizan el valor de una clave.
+
+Además, cuando se tienen varios segmentos, la
+operación de compactación puede realizarse a la vez
+que se fusionan, el contenido de dos archivos se utiliza
+para generar un archivo nuevo sin claves duplicadas
+(utilizando el valor más reciente para esa clave).
+Este trabajo se realiza sin desatender las lecturas y
+escrituras, utilizando los archivos originales para la
+lectura y el segmento más reciente para las escrituras.
+Una vez ha terminado el proceso de compactación, será
+este archivo el que se utilice para las lecturas, eliminado
+los segmentos originales
+
+Al pasar de un único archivo de log a varios segmentos,
+ahora es necesario contar con diferentes tablas hash. En
+el momento de realizar una lectura, se empezará por la
+tabla del último segmento (el más reciente) hacia atrás,
+de tal modo que la primera tabla que cuente con la clave
+será el valor más reciente. El proceso de fusionado ayuda
+a que el número de segmentos se mantenga reducido.
+
+Por ejemplo, es necesario gestionar la eliminación de
+registros. Un carácter especial es utilizado para que
+cuando se lleva a cabo el proceso de fusionado ese
+registro se elimine. También una parte importante en
+la práctica es mantener en un estado usable la base
+de datos, ello pasa por la recuperación ante un fallo
+
+Si es necesario reiniciar la base de datos, es necesario
+cargar nuevamente los índices para cada segmento y
+si estos son de un tamaño considerable el proceso de
+inicialización puede llegar a ser lento. Por este motivo,
+soluciones como la escritura en disco del índice facilitan
+el tiempo de arranque de la base de datos. De la misma
+manera, mantener la base de datos en un estado usable
+conlleva que, al producirse un fallo en la base de datos,
+si este se produce en medio de una escritura, este
+registro puede ser detectado y eliminado. Por último,
+en una base de datos es normal que varios clientes
+quieran escribir y leer de forma concurrente. La lectura,
+gracias a que los registros no se modifican no conlleva
+problemas mientras que para la escritura una elección
+estandarizada es utilizar un único thread de tal modo que
+se produzcan secuencialmente.
+Como inconvenientes de este tipo de almacenamiento
+es que como ya se indicó en la tabla de índices debe
+caber en memoria por lo que no resulta una solución
+adecuada si el conjunto de datos tiene numerosas claves
+diferentes [1].
+Otro de los inconvenientes es la ineficiencia en la
+búsqueda por rangos, porque en este caso es necesario
+buscar individualmente cada clave.
+
+Almacenamiento en log con secuencias ordenadas por clave
+
+El almacenamiento en tablas de cadenas ordenadas o
+sorted string tables (SSTables) para abreviar se basa
+en almacenamiento en log, no obstante manteniendo la
+secuencia de clave-valor ordenada por clave. También es
+necesario que cada clave aparezca solo una vez en cada
+segmento de fichero.
+
+Este tipo de almacenamiento tiene algunas ventajas
+respecto al sistema de log. A la hora de fusionar
+archivos el proceso es muy eficiente gracias a que las
+claves están ordenadas, se leen todos los segmentos
+a la vez copiando cada vez la clave inferior (la que
+aparece antes) con el valor más reciente, de esta forma
+el resultado final es un archivo igualmente ordenado. El
+valor más reciente siempre será aquel que aparezca en
+un segmento más nuevo.
+
+Otra de las ventajas es que no es necesario mantener
+un índice de todas las claves en memoria. Bastaría
+con un índice anterior y otro posterior, ya que, al estar
+las claves ordenadas, la clave buscada deberá estar
+entre ambas.
+Otra ventaja de poder almacenar solo algunos de los
+índices y que las lecturas realicen la búsqueda entre esas
+claves es que los registros que no tienen clave pueden
+agruparse y comprimirse antes de escribirlos a disco.
+Con cada índice apuntando a cada bloque comprimido,
+de tal manera que se reduzca tanto el espacio en disco
+como la transferencia de operaciones de entrada/salida.
+
+
+Otro detalle importante para el uso práctico de esta
+estructura es cuándo y cómo se produce la fusión y
+compactación de segmentos. Existen dos opciones:
+por tamaño o por nivel. Por tamaño, los segmentos más
+nuevos y pequeños se fusionan con segmentos más
+antiguos y grandes. En el caso de la compactación por
+niveles, el rango de claves se divide en SSTables más
+pequeñas y los datos más antiguos se mueven a niveles
+separados, permitiendo que la compactación se realice
+de forma incremental y use menos espacio.
+
+
+Arboles B.
+
+A diferencia de las estructuras previas, la estructura de
+árboles B, sobrescriben las páginas. Esta operación,
+aunque mantiene las referencias previas intactas
+puede llegar a ser peligrosa especialmente cuando
+el tamaño de una página ha llegado al máximo y es
+necesario escribir dos nuevas páginas (la división de la
+página que ha llegado al máximo), así como modificar
+la página padre con las nuevas referencias de las dos
+páginas hijas. El peligro reside en que, si la base de datos
+falla en el momento de realizar la escritura de las dos
+nuevas páginas, los índices se corrompen dando lugar al
+fenómeno de las páginas huérfanas.
+
+Para hacer frente a los fallos, este enfoque utiliza
+algo que ya se ha revisado en los árboles LSM, es un
+fichero de log de escrituras. Este log se conoce como
+Write-Ahead Log (WAL). Es un fichero en el que se va
+concatenando las operaciones a realizar antes de
+modificar el propio árbol. En caso de recuperarse de un
+fallo, la base de datos utilizará este archivo para volver
+a un estado consistente.
+
+Parte de la mejora en operaciones de escritura de los
+árboles LSM comparado con los árboles B, se debe a
+que la amplificación de escritura suele ser menor. Otro
+de los aspectos que influyen es la capacidad o el grado
+de compactación. Los árboles LSM llegan a conseguir
+un nivel de compactación muy alto. Por parte de los
+árboles B, las páginas dejan espacios de disco sin usar
+(conocido como fragmentación) por lo que el espacio en
+disco utilizado es mayor. Este último fenómeno también
+tiene un impacto directo en las lecturas, ya que éstas
+consumen menos ancho de banda de transferencia con
+el disco duro.
+
+
+Cuando el número de claves no cabe en memoria, una de las opciones posibles es la de cambiar el modelo de índices a tablas de cadenas ordenadas, de tal manera que gracias a la compactación y que no es necesario tener todas las claves en memoria.
+
+
+HINTS: arboles AVL, arboles rojo-negro (memtable), árbol Log-
+Structured Merge-Tree (LSM)
+
+
+
+
+Formatos de codificación.
+
+
+
+
+Modelos de flujos de datos y formatos de codificación.
+
+La elección del encoding (mantenibilidad del sistema)
+
+Consecuentemente, un sistema necesita mantener la
+compatibilidad en ambos sentidos:
+• Compatible hacia atrás. La nueva aplicación debe
+leer datos de la antigua versión. Como programador
+de la aplicación y conocedor del formato nuevo y
+antiguo es factible gestionar el formato antiguo.
+• Compatible hacia adelante. Este tipo de
+compatibilidad es más complicado, ya que requiere
+que el código antiguo soporte los nuevos datos
+escritos por el nuevo código.
+
+Formatos específicos de lenguaje.
+
+Las aplicaciones utilizan datos en memoria en forma de objetos, listas, pilas, colas, árboles, etc.
+y datos que almacenan en un sistema persistente (base de datos, ficheros) o envían por la red, cuando los datos en memoria se persisten o se envían, pasan por un proceso llamado encoding, es decir, una transformación o traducción a una secuencia de bytes.
+
+esta solución no es recomendable para todo
+aquello que no sea temporal, debido a los inconvenientes
+que presentan:
+• La serialización nativa suele ser ineficiente en
+términos de tiempo y de tamaño de los datos
+codificados.
+• No presentan una forma sencilla de versionar la
+información por lo que la compatibilidad entre
+versiones es complicada.
+
+En la documentación de estas bibliotecas: Serializable,
+Pickle, etc. se pueden ver avisos sobre los riesgos de
+seguridad que presentan. En la serialización es posible
+incluir código que ejecute código malicioso en la
+deserialización [1].
+Por último, la serialización es particular de cada lenguaje
+de programación por lo que es difícil hacer interactuar
+dos aplicaciones programadas en dos lenguajes
+diferentes.
+
+
+Objeto -> flujo de bytes >>>memoria, archivo, base de datos
+
+Formatos estandarizados:
+XML -> caract: no se puede distinguir el número de una cadena de caracteres con esos números
+JSON -> caract: no distingue entre números enteros y de punto flotante, ninguno de estos formatos tiene soporte para cadenas binarias (binary strings).
+
+BSON: resuelve los problemas anteriores (nativo de Mongo DB)
+
+      -	UBJSON : BSON+MessagePack
+
+WBXML
+
+Formatos binarios basados en esquemas.
+
+Tanto Facebook como Google han elaborado sus propias bibliotecas de codificación binaria exigiendo la descripción del esquema
+Facebook: Thrift -> BinaryProtocol, DenseProtocol, CompactProtocol
+Google: Protocol Buffers (Similar a Compact Protocol)
+
+
+Avro también utiliza un esquema para especificar la
+estructura de un mensaje, pudiendo especificarlo en
+dos lenguajes diferentes, uno basado en JSON y otro,
+Avro IDL, más cercano a lenguajes de programación
+como C++ o Java.
+
+La compatibilidad entre una aplicación que utiliza un
+esquema para leer datos y otra que utiliza un esquema
+para escribir no exige, realmente, que el esquema sea
+el mismo, sino que los esquemas sean compatibles. La
+biblioteca de Avro llama a este proceso resolución de
+esquema, y consiste en partir del esquema de escritura
+y traducir los datos al esquema de lectura
+
+Avro
+también es utilizado como formato de transmisión
+entre sistemas distribuidos (por ejemplo, junto a Kafka).
+
+
+
+Flujo de datos entre procesos.
+
+Cliente servidor: un servidor expone una API
+El patrón arquitectural de microservicios, en el que una
+aplicación es descompuesta en un conjunto de servicios
+que actúan tanto de clientes como de servidores para
+ganar independencia en el despliegue y escalabilidad,
+es tremendamente popular.
+
+Un servicio web es aquel que utiliza el protocolo HTTP:
+REST (Representation State Transfer): Base el protocolo HTTP. Uso de sintáxis universal para la identificación de recursos, un conjunto de operaciones bien definidas que se aplican a estos: 
+POST
+GET
+PUT
+DELETE
+Las API que siguen estos principios se denominan RESTful
+SOAP: Protocolo basado en XML, es la base de un conjunto de servicios web basados en un lenguaje fundamentado en XML llamado Web Services Description Language (WSDL)
+
+
+Con anterioridad a REST y SOAP ya existían tecnologías
+para realizar peticiones sobre red como Distributed
+Component Object Model (DCOM), Common Object
+Request Broker Architecture (CORBA) o Remote Method
+Invocation (Java RMI), entre otras.
+
+Ante estas diferencias es comprensible que los frameworks
+RPC más nuevos hagan explícitas las diferencias entre
+la llamada a una función local y una petición que tiene
+que viajar por red.
+
+
+Flujo de datos en paso de mensajes
+Los sistemas asíncronos de paso de mensajes permiten
+que las peticiones de los clientes se entreguen con
+una baja latencia, enviando los mensajes mediante un
+intermediario llamado bróker de mensajería que los
+almacena temporalmente.
+
+El uso de un bróker de mensajería
+permite disponer de un búfer que previene la pérdida de
+mensajes cuando el destinatario no está disponible o
+está sobrecargado. 
+
+Este patrón de comunicación se cataloga de asíncrono
+porque el emisor no espera a que se entregue el mensaje,
+por lo que normalmente la comunicación es de un único
+sentido. En el caso de que el receptor quiera enviar una
+respuesta, lo hará normalmente mediante otro canal.
+
+
+
+
+
+
+
+
+HINTS: Marshaling/serialización
+
+
+
+
+
+
+
+
+
+Tema 5
+Replicación
+
+Sistemas locales -> sistemas distribuidos
+
+Si un sistema aumenta su carga, tiene dos opciones: Aumentar la capacidad de la máquina, ampliando su memoria RAM/añadiendo discos duros o mejorando la CPU (escalado vertical). La mejora en el rendimiento no es proporcional al coste.
+
+Escalado horizontal:
+
+distribuir la base de datos a lo largo de diferentes máquinas, que se conocen como nodos
+Distribuir los datos en diferentes máquinas permite disponer de servidores más proximos a los clientes y consecuentemente reducir la latencia.
+
+En el caso de la replicación de datos significa mantener una copia de los datos en diferentes máquinas.
+Otra de las formas de distribución de los datos en diferentes nodos es utilizando el particionado. El particionado tambien se conoce como Sharding
+
+Teorema CAP.
+
+La disponibilidad refleja la fiabilidad de un sistema de medida como el tiempo fuera de servicio (downtime)
+
+
+Cuando se realiza una serie de operaciones que se
+quiere que el sistema sea consistente, es decir, que se
+garantice el orden original en el que se realizaron las
+operaciones con los datos. Este tipo de consistencia se
+conoce como consistencia atómica o linealizable (este
+es solo uno de los modelos de consistencia posibles
+que se estudiaran junto a otros en la siguiente sección)
+
+El teorema CAP o la conjetura de Brewer, evalúa la
+imposibilidad de un sistema para garantizar consistencia,
+disponibilidad y tolerancia al particionado [1]
+Un sistema no puede garantizar simultáneamente la disponiblidad y la consistencia ante particiones de red.
+
+
+En este sentido, el teorema de CAP (figura 1) ofrece dos
+opciones para los sistemas distribuidos:
+• Consistente y tolerante a particiones de red.
+Estos sistemas eligen dar un fallo a devolver datos
+inconsistentes.
+• Disponible y tolerante a particiones de red. Estos
+sistemas eligen perder consistencia y servir datos
+potencialmente inconsistentes a no servir una
+petición.
+
+Se evidencia cómo los sistemas tradicionales de
+gestión de bases de datos relacionales, que están
+pensados para ejecutarse en una única máquina, son
+los que tienen las características de consistencia y
+disponibilidad. En el caso de sistemas, que utilizan un
+algoritmo de consenso, que requieran que la mayoría
+de los nodos confirmen la escritura, como es el caso
+de MongoDB, serán sistemas catalogados como CP,
+consistentes y con tolerancia a fallos. En el caso de que
+la escritura pueda llevarse a cabo en un único nodo, se
+estaría ante bases de datos DP, como Cassandra.
+
+
+
+
+
+
+
+El teorema de PACELC es una extensión del teorema CAP: Se afirma que, en caso de una partición de red,
+se debe elegir entre disponibilidad y consistencia
+(como indica el teorema de CAP), de lo contrario (E),
+incluso cuando el sistema funciona con normalidad,
+hay todavía una elección que hacer entre latencia (L)
+y consistencia (C).
+
+Armando Fox y Eric A. Brewer proponen relajar estas
+definiciones tan estrictas facilitando estrategias para
+mejorar la disponibilidad tolerando una degradación
+elegante del servicio [2]. Esta degradación se define
+mediante dos métricas: harvest y yield, que constituye un
+comportamiento correcto.
+
+5Replicación |
+• Harvest: define cómo de completa tiene que ser
+una consulta. Si la consulta tiene que devolver
+140 registros y devuelve 139 por la falta de
+disponibilidad de algún nodo es mejor que devolver
+ningún campo fallando.
+• Yield: es una métrica común y se suele especificar
+en nueves. Se trata de la disponibilidad de un sistema
+medida como el número de peticiones que fueron
+respondidas en relación con el número de peticiones
+totales. Los sistemas de alta disponibilidad buscan
+un 99,99 % o superior de peticiones respondidas.
+Esta métrica es más exigente que la métrica de
+tiempo de actividad (uptime) porque un sistema
+puede estar activo, sin embargo, debido a la carga
+no ser capaz de responder a las peticiones.
+
+Estas nuevas métricas relajan la perspectiva tan
+marcada del teorema de CAP, centrando la discusión
+en cómo actuar ante fallos: si no responder y, por lo
+tanto, reducir el yield o enviar una respuesta incompleta
+(reducir el harvest manteniendo el yield). Esta discusión
+ayuda a entender la criticidad de los datos devueltos
+en las consultas, así como a mejorar la resiliencia del
+sistema ante fallos.
+
+Modelos de consistencia.
+
+Sirven para dar explicación al comportamiento de un sistema con multiples réplicas.
+Los modelos de consistencia intentan restringir qué se puede esperar desde el punto de vista del estado de una réplica, es decir, que estados pueden darse bajo qué modelos
+
+Modelo de consistencia estricta: Este modelo
+asume que cualquier escritura está, de forma inmediata,
+disponible en cualquier lectura posterior.
+
+El modelo de instrucción atómica o linealizabilidad es
+el modelo de consistencia más exigente. Bajo este
+modelo, cada operación parece llevarse a cabo de
+forma instantánea, de tal manera que la representación
+de las operaciones es un histórico secuencial de estas,
+aunque ocurran concurrentemente. La condición que
+se establece para que un histórico sea linealizable
+es que cada operación completada devuelva el
+mismo resultado que si cada operación hubiera sido
+completada una por una. Además, si una operación O1
+se completa antes que una operación O2, entonces O1
+precede en el histórico a O2.
+
+este modelo permite diferentes
+explicaciones a un conjunto de operaciones es por lo
+tanto un modelo indeterminista.
+
+El momento
+en el que una operación tiene efecto se llama punto de
+linealización
+
+Modelo de consistencia secuencial: permite ordenar las operaciones como si hubieran sido ejecutadas en algún orden secuencial.
+
+La diferencia con el modelo de linealizabilidad es que
+éste mantiene el orden de las operaciones en tiempo
+real (diferentes procesos) mientras que el modelo de
+consistencia secuencial solo respeta el orden para
+operaciones de un proceso.
+
+Este modelo no preserva una ordenación global de
+las operaciones, no obstante, sí presenta un orden
+consistente para cada cliente o proceso. 
+
+Modelos de replicación.
+En un entorno distribuido existen diferentes algoritmos
+para replicar los cambios entre nodos. Estos algoritmos
+son conocidos como modelos líder-seguidor.
+
+En esta solución, se designa un líder (también conocido
+como maestro), un nodo al que se deben dirigir las
+escrituras, solo él aceptará las escrituras. El líder
+escribirá en su almacenamiento local la información.
+
+El resto de las réplicas son conocidas como seguidores
+o esclavos. Cuando el líder almacena la información
+también envía ésta a todos los seguidores como
+parte del log de replicación. A partir de este log cada
+réplica actualiza su copia local, aplicando los cambios
+necesarios.
+En el caso de una lectura el cliente de la información
+puede leer tanto del líder como de cualquiera de los
+seguidores.
+
+La gran desventaja de este modelo de replicación es
+que todas las escrituras tienen que pasar por el líder.
+Por lo tanto, si un cliente que quiere escribir en la base
+de datos no puede conectar con el líder los datos no
+podrán ser escritos.
+
+Una solución evidente es la de permitir que las escrituras
+puedan realizar en más de un nodo. Este modelo de
+replicación se conoce como multilíder o también como
+réplica activa/activa o maestro/maestro. En este caso,
+cada líder es, al mismo tiempo, líder y seguidor de otros
+líderes, procesando las escrituras y reenviándolas a sus
+seguidores y recibiendo actualizaciones de otros líderes.
+
+
+	Tema 6
+Transacciones distribuidas
+
+
+Se analiza el concepto de transacción y sus diferentes algoritmos como:
+commit en 2 fases
+commit en 3 fases
+Arquitectura Calvin
+Enfoque Spanner
+Tratamos el concepto de serializabilidad (relacion) con la propiedad de aislamiento en DB
+
+Transacciones distribuidas
+
+Una transacción es una agrupación lógica de varias operaciones contra la base de datos (lecturas o escrituras)
+
+Esta operación tiene éxito o falla
+como una única operación, es decir, o se llevan a cabo
+todas (commit) o si alguna falla, se aborta haciendo un
+rollback.
+
+Trabajaremos las transacciones distribuidas (varios nodos - participantes).
+
+una transacción puede fallar en algunos
+nodos y tener éxito en otros. Por este motivo, para
+mantener la atomicidad de una transacción todos los
+nodos tienen que consensuar si aceptan o rechazan la
+transacción -> problema de consolidación atómica
+
+el resultado de una transacción debe
+ser commit (consolidación) y en ese caso, los cambios
+se perdurarán o el aborto de la operación, en este
+último caso de las escrituras hechas desde el inicio de
+la transacción deben ser deshechas (rollback).
+
+demás, de mantener
+la consistencia de datos, también garantiza que los
+índices son consistentes con los datos, de lo contrario
+los índices perderían su utilidad.
+
+Es importante señalar que cuando la base de datos
+solo es de un nodo la atomicidad de la transacción
+radica en que primero se escribe el cambio a disco y
+luego el registro de commit.
+
+utilizar la técnica para un único nodo puede
+llevar a estados inconsistentes entre nodos y una vez que
+una transacción ha sido aceptada en un nodo no puede
+ser deshecha. Por este motivo, un nodo solo debe hacer
+commit si todos los nodos van también a hacer commit.
+
+Protocolos para las transacciones distribuidas.
+
+Commit de dos fases:
+Este algoritmo divide el proceso en dos fases:
+prepare
+commit/abort
+existe una figura conocida como coordinador o gestor de transacciones que gestionarlas dos fases de la transacción
+
+
+Cuando la
+aplicación quiere realizar los cambios, el coordinador
+comienza la fase uno, enviando una petición de prepare
+a cada uno de los nodos, preguntándoles si puede
+hacer commit. El coordinador recibe las respuestas de
+los participantes, pudiendo darse dos casos:
+1. Todos los participantes dicen que sí, entonces el
+coordinador, en la segunda fase, envía una petición
+de commit, y los commits de cada base de datos se
+llevan a cabo.
+2. En el caso en el que alguno de los participantes
+responda que no, el coordinador, en fase dos, envía
+una petición de abort a todos los nodos.
+
+En los casos en los que un participante, tenga un timeout
+o la red falle en la fase de prepare, el coordinador aborta
+la transacción.
+
+n el caso de que se produzca un error en
+la segunda fase (commit) el coordinador lo reintenta de
+forma indefinida.
+
+debilidad -> falla en el coordinador
+
+. Si el fallo del coordinador se produce
+antes de comenzar con la fase uno prepare, cada nodo
+abortará la transacción. Sin embargo, si el coordinador
+falla antes de iniciar la fase de commit, el nodo que
+recibió el prepare y dijo que sí podía consolidar la
+transacción deberá esperar a que el coordinador
+se recupere indicando si la transacción hay que
+consolidarla o abortarla. Las transacciones que quedan
+en este estado de espera se llaman transacciones
+inciertas o en duda.
+
+el coordinador
+tiene un registro de transacciones en el que escribe
+antes de enviar las peticiones de commit o abort a los
+participantes. De tal manera que el coordinador cuando
+se recupera revisa el estado de todas las transacciones
+en duda consultando al log de transacciones. Si alguna de
+las transacciones no tiene un registro de consolidación
+entonces se abortan.
+ESTE ALGORITMO ES DE PROTOCOLO NO BLOQUEANTE.
+
+
+Algoritmo de tres fases (Dale Skeen y Michael Stonebraker).
+
+sta propuesta tiene como
+objeto construir un protocolo robusto de operaciones
+atómicas ante fallos del coordinador.
+
+El commit de tres fases añade un paso extra respecto al
+commit de dos fases y timeouts tanto en la interacción
+del coordinador como en la de los nodos participantes
+permitiendo que puedan consolidar o abortar una
+transacción incluso ante un fallo del coordinador.
+
+El commit de tres fases consiste en los siguientes pasos:
+• Propuesta: el coordinador envía una propuesta de
+transacción y recolecta las decisiones de los nodos.
+• Preparación: el coordinador notifica a los
+participantes el resultado de las decisiones. Si
+todos los participantes han decidido consolidar
+la transacción, el coordinar envía un mensaje de
+preparación, indicándoles que se preparen para la
+fase de commit. En cualquier otro caso, el mensaje
+es para abortar la transacción y el proceso finaliza.
+• Commit: los participantes son notificados por
+el coordinador de realizar la consolidación de la
+transacción.
+
+Después de recolectar la información, el coordinador
+toma una decisión. Si el coordinador decide seguir
+adelante, prepara una petición de preparación. En
+este punto puede ocurrir que el coordinador no llegue
+a enviar la decisión a todos los participantes o que
+no reciba respuesta de algún nodo. En este caso,
+transcurrido el tiempo establecido, los nodos pueden
+abortar la operación.
+
+ste algoritmo
+tiene mayor sobrecarga debido a un mayor número
+de comunicaciones entre el coordinador y los
+nodos. Asimismo, este algoritmo puede llevar a la
+inconsistencia conocida como cerebro divido. Ante
+una partición de red, el coordinador puede quedar
+inaccesible para algunos nodos, estos podrían no
+hacer llegar la respuesta a la petición de preparado y
+a diferencia del resto de nodos que consolidarían la
+transacción, estos la abortarían.
+
+
+
+Hints: cerrojo de exclusión mutua.
+
+En caso de que un nodo falle la
+transacción no se aborta (como podía ocurrir en los
+anteriores algoritmos) sino que recupera su estado
+a partir de los otros participantes que ejecutaron en
+paralelo la misma transacción.
+
+Bajo el escenario de poder mantener el orden de las
+transacciones no hay necesidad de coordinación entre
+nodos, ya que, ante la misma secuencia de eventos de
+entrada, los nodos tendrán resultados equivalentes. Este
+enfoque se conoce como Calvin 
+
+Para conseguir que el orden de las operaciones sea determinista, Calvin usa un secuenciador
+el orden global de ejecución
+de las transacciones, acumulando y agrupando las
+transacciones en periodos pequeños de tiempo, de tal
+forma que no es necesario comunicar transacción por
+transacción
+
+Cada transacción en la arquitectura Calvin tiene un
+conjunto de lectura y un conjunto de escritura.
+Cada hilo gestionado por el planificador realiza cuatro
+pasos:
+1. Analiza los conjuntos de lectura y escritura,
+determina los nodos implicados a partir del conjunto
+de lectura y crea una lista de participantes activos,
+que son los que tienen los elementos del conjunto
+de escritura y realizarán las modificaciones.
+2. Recopila los datos del nodo local necesarios para
+llevar a cabo la transacción y envía los registros a
+los participantes activos.
+3. Si el hilo está en un participante activo, recibirá los
+registros que le envíen los otros participantes.
+4. Por último, se ejecuta el conjunto de transacciones,
+persistiendo los resultados en la partición. No es
+necesario reenviar los resultados a otros nodos
+porque todos los nodos reciben la misma información
+y persisten los resultados localmente.
+
+Otro enfoque diferente al de Calvin y que a menudo se
+compara con este, es el enfoque de Spanner. En este
+enfoque bastante complejo, se utiliza true time. Un reloj
+distribuido con alta disponibilidad y de alta precisión, ya
+que asegura que una marca T1 será mayor que cualquier
+otra marca T2 si T2 terminó de generarse antes de que
+T1 comenzara a hacerlo.
+
+El enfoque Spanner ofrece tres tipos de operaciones.
+Transacciones de lectura-escritura que requieren de
+exclusión mutua y el líder de los nodos. Transacciones
+de sólo lectura que pueden ejecutarse contra cualquier
+réplica y que no necesitan de bloqueos/exclusión
+mutua. Para este tipo de transacciones sólo es
+necesario contar con el líder para la última operación.
+Por último, las lecturas de snapshots
+
+
+Aislamiento de operaciones.
+
+Concepto de serializabilidad y bloqueo de dos fases.
+
+La serializabilidad es conocido como el aislamiento
+más fuerte. Esto significa que es la única propuesta
+que garantiza que, aunque se realicen diferentes
+transacciones de forma paralela, el resultado final es el
+mismo que si se hubiera ejecutado en serie, sin ningún
+tipo de concurrencia. Por lo tanto, si la base de datos
+realiza correctamente la ejecución de una transacción,
+con este tipo de aislamiento, se puede generalizar
+y decir que la base de datos funcionará sin ningún
+problema ante transacciones concurrentes
+
+
+Bloqueo de dos fases:
+en ella se permite la lectura concurrente del mismo objeto
+siempre y cuando nadie esté escribiendo en él. Tan
+pronto como un proceso quiere realizar una operación de
+modificación, ya sea escritura, actualización o borrado
+de un objeto se exige un acceso exclusivo.
+
+El nombre de esta técnica viene de que en la primera
+fase la transacción para llevarse a cabo debe adquirir el
+cerrojo y la segunda fase, cuando acaba la transacción
+todos los cerrojos se liberan.
+
+Si una transacción T1 está leyendo un objeto y una
+transacción T2 quiere escribir, T2 debe esperar a que
+T1 finalice. Del mismo modo si T1 está escribiendo, la
+transacción T2 debe esperar a que T1 acabe.
+
+Los cerrojos pueden ser en modo exclusivo o en modo compartido
+
+
+Si una transacción quiere leer un objeto, tiene que
+adquirir un cerrojo/bloqueo compartido. Este tipo de
+cerrojo puede ser adquirido por muchas transacciones
+que quieran leer. En el caso de que una transacción haya
+adquirido un cerrojo en modo exclusivo, las lecturas
+deben esperar.
+	
+
+Tema 7
+Particionado
+
+El particionado consiste en distribuir entre un conjunto de nodos un conjunto de datos muy grande (sharding).
+El particionado de las bases de datos no es exclusivo de las bases de datos NoSQL, como los vnodes de Cassandra, los buckets de CouchDB o los shards de MongoDB.
+La combinación de la replicación y la partición permiten que varias copias puedan almacenarse en diferentes nodos.
+
+El particionado y replicación juntos se pueden ver como
+un nodo que alberga diferentes particiones, teniendo un
+líder y varios seguidores, esta podía ser la representación
+de la distribución de un conjunto de datos utilizando
+tanto replicación como particionado.
+
+Tipos de particionado
+
+En un particionado ideal con P particiones, si la
+carga se distribuye uniformemente la infraestructura
+nos permitiría un rendimiento cercano a P veces el
+rendimiento de un único nodo. En el peor de los casos
+podríamos encontrarnos con P-1 particiones sin ser
+utilizadas y un único nodo en uso. Este nodo se conoce
+como hot spot. En el caso de que simplemente algunos
+nodos reciban más peticiones que otros, se habla de
+particiones sesgadas (skewed)
+
+La solución más sencilla para conseguir un particionado
+equilibrado es asignar la información a los nodos de
+forma aleatoria. Esta solución presenta rápidamente un
+inconveniente y es que a la hora de realizar las consultas
+de lectura será necesario preguntar a todos los nodos
+en paralelo dado que no es posible saber en qué nodo
+se almacenó la información.
+Uno de los tipos posibles de particionado es el
+particionado por rango, en este se puede ver el resultado
+de dividir datos de población por rangos de edad. De tal
+modo que conociendo los rangos de las particiones y
+qué rango pertenece a qué partición, las consultas o
+escrituras pueden realizarse directamente contra el
+nodo correspondiente.
+
+Es importante señalar que para conseguir una
+distribución de la carga no necesariamente los rangos
+deben ser del mismo tamaño. En el caso de la población,
+por ejemplo en España, el número de habitantes en
+rango de edad 31-50 es similar a un rango bastante más
+grande como el de 0-30. Por lo tanto, a la hora de diseñar
+los rangos es necesario adaptarlos a la información que
+vamos a almacenar. También existe la posibilidad de
+delegar la responsabilidad de selección de rangos al
+sistema gestor de bases de datos, como por ejemplo es
+posible en el sistema big table de Google.
+
+
+En el caso de un sistema con un gran número de lecturas,
+también es interesante mantener dentro de cada
+partición las claves ordenadas, de tal modo que tanto la
+búsqueda como las consultas de rangos adyacentes de
+información sean mucho más rápidas.
+La desventaja de este tipo de particionado es que si
+la elección de los rangos no sigue una distribución
+uniforme, acabaremos con particiones sesgadas y en el
+peor de los casos con un hot spot. Este problema ocurre,
+entre otros casos, cuando se utiliza una marca de tiempo
+como clave. Si utilizáramos un sistema particionado con
+clave de marca de tiempo para albergar publicaciones
+de un blog, lo que veríamos sería un llenado progresivo
+de cada uno de los discos duros de cada nodo, primero
+el nodo 1, luego el nodo 2, etc. Para evitar este problema,
+se puede utilizar un primer elemento diferente como
+prefijo de la clave. Por ejemplo, si tuviéramos un blog
+con diferentes temáticas, podríamos anteceder la
+temática y concatenar la marca de tiempo. En este
+caso la distribución sería más uniforme, sin embargo
+es importante tener en cuenta que a la hora de buscar
+publicaciones para un rango de fechas de diferentes
+temáticas, se llevarían a cabo diferentes consultas por
+temática.
+
+Un último modo de realizar las particiones que vamos a
+ver intentando evitar el problema de los hot spots y las
+particiones sesgadas es utilizar una función hash para
+una clave.
+Las funciones hash permiten tener una distribución
+uniforme. Diferentes gestores NoSQL utilizan este
+tipo de funciones, por ejemplo, MD5 es utilizado por
+MongoDB y Cassandra.
+En la práctica, a cada partición se le asigna un rango de
+hashes, ya que estos son los que estarán uniformemente
+distribuidos. Por lo que todas las claves que estén en
+ese rango de hashes tendrán asignado esa partición.
+
+Otro problema de este tipo de particionado pero mucho
+más aislado, que sí puede llevar a producir hot spots, es
+en aquellos sistemas que realizan muchas operaciones
+para una clave concreta o conjunto reducido de claves.
+Dado que la función hash siempre devuelve el mismo
+valor para una determinada clave, en el supuesto en que
+todas las lecturas y escrituras sean para esa clave, ese
+nodo se sobrecargará.
+
+Indices en particiones.
+
+Los índices secundarios son ampliamente utilizados
+tanto en sistemas de bases de datos relacionales
+como en bases de datos documentales. Sin embargo,
+no se han prodigado tanto en aquellas bases de
+datos de tipo clave-valor debido a la complejidad
+de su implementación. Contrariamente, los índices
+secundarios son la razón de existir de servidores de
+búsqueda como Elasticsearch.
+
+El primer enfoque que se va a revisar es el particionado por
+documentos. En este enfoque cada partición mantiene
+sus índices primarios y sus índices secundarios sin
+tener en cuenta el resto de las particiones. Los índices
+secundarios funcionan como índices corrientes en
+la existencia de un único nodo, es decir, solo hay que
+interactuar con los índices cuando se escriba, elimine
+o actualice un documento de esa partición. Este tipo
+de índices es conocido como índices locales. Este tipo
+de índices es por lo tanto muy efectivo en cuestión de
+operaciones modificadoras (crear, actualizar o eliminar).
+Sin embargo, presenta un problema en las lecturas.
+Dado que una partición no tiene por qué contener todos
+los documentos para una condición o valor del índice
+secundario, es necesario ejecutar una consulta a todas
+las particiones y combinar los resultados.
+
+El enfoque basado en la distribución de las peticiones,
+procesamiento y unificado es conocido como scatter/
+gather. El enfoque de particionado por documentos
+es utilizado por muchos gestores reconocidos:
+MongoDB, Cassandra, ElasticSearch, Solr, etc. Aunque
+el procesamiento de las peticiones puede realizarse en
+paralelo este patrón es proclive a sufrir latencia de cola.
+Por este motivo es recomendable aunque, en la práctica,
+bastante complicado, que el esquema de particionado
+se estructure de tal forma que las peticiones con índices
+secundarios puedan ser atendidas mediante una única
+partición.
+Otro enfoque posible para los índices secundarios
+es utilizar índices globales, es decir que los índices
+secundarios tengan en cuenta no solo los datos de su
+partición (índice local) sino los de todas las particiones.
+Esta estrategia de particionado se conoce como
+particionado por término.
+
+A la hora de distribuir los índices secundarios se tienen
+dos opciones, por el propio término o utilizando el valor
+hash para ese término. Del mismo modo que en el
+particionado de claves primarias, la función hash tiene el
+beneficio de una distribución de la carga más equitativa
+y, como contrapartida, utilizar el propio término permite
+sacarle más partido en búsquedas por rango.
+
+Rebalanceo de particiones.
+
+Hash Modulo N.
+
+6Particionado |
+Si se utiliza un particionado por el hash de una clave,
+es decir, un rango de hashes va a la partición 0, otro
+rango a la partición 1 y así sucesivamente, la estrategia
+de asignar una clave a un nodo utilizando hash módulo
+N presenta el problema que cuando el número de
+nodos varía, el resultado de la operación hash módulo
+N es diferente provocando un movimiento mayor del
+necesario de las particiones entre nodos.
+Una estrategia sencilla es asignar más particiones que
+nodos, asignando varias particiones a cada nodo. Con
+esta estrategia, hay que suponer que se tienen 5 nodos
+con 25 particiones en total, teniendo por lo tanto cada
+nodo 5 particiones.
+En el caso de que se elimine un nodo del sistema, las 5
+particiones se distribuirán entre el resto de nodos hasta
+conseguir una distribución justa. Del mismo modo, si
+se añade un nodo al sistema, cogerá aproximadamente
+una partición de cada nodo para conseguir redistribuir
+la carga.
+En esta estrategia las particiones se mueven de forma
+completa, es decir, no se mueven partes de ellas creando
+o eliminando particiones, sino que el número particiones
+permanece invariable.
+
+El lector más agudo habrá pensado en el inconveniente
+que podría presentarse al iniciar la base de datos
+sin saber dónde establecer el límite del tamaño de
+la partición, ya que podríamos estar en el caso de
+utilización de un único nodo, dejando al resto sin utilizar.
+Para paliar este problema, algunos gestores permiten
+establecer un conjunto inicial de particiones, también
+conocido como pre-splitting 
+Tema 8
+Procesamiento de datos fuera de linea
+
+Lo importante será el tiempo de respuesta y la experiencia de usuario.
+
+
+Sistemas de procesamiento online: estos sistemas
+son los recién mencionados. El sistema espera
+una petición y la intenta gestionar los más rápido
+posible dándole al usuario una pronta respuesta.
+
+• Sistemas de procesamiento offline (por lotes): este
+tipo de sistemas tienen como entrada una cantidad
+muy elevada de datos, ejecutan un trabajo para su
+procesamiento produciendo otros datos de salida.
+Los trabajos llevan un tiempo (minutos, horas o
+incluso días), por lo que la interacción es diferente a
+los sistemas más extendidos. En este caso, el foco
+es el rendimiento del sistema, es decir, el tiempo de
+procesamiento para un conjunto de datos.
+
+• Sistemas de procesamiento en tiempo real: este
+tipo de sistemas, al igual que los sistemas de
+procesamiento por lotes, reciben un conjunto de
+datos de entrada y producen una salida. A diferencia
+de los sistemas anteriores, la respuesta debe ocurrir
+en un periodo de tiempo reducido, pareciéndose en
+este aspecto más a los sistemas online.
+
+Procesamiento por lotes
+
+UNIX estableció como su principio de diseño que cada
+aplicación del sistema debía hacer solo una cosa y
+hacerla bien, en lugar de tener una herramienta que haga
+multitud de operaciones o que cuente con multitud de
+funcionalidades. Las aplicaciones de UNIX cumplen
+un único objetivo: ordenar, listar, dividir, extraer, etc.
+
+La interoperabilidad o la facilidad de componer
+operaciones o transformaciones con comandos UNIX es
+posible gracias al uso de interfaces compatibles. En este
+caso, la interfaz compatible es un descriptor de fichero.
+Esta interfaz permite sorprendentemente representar
+elementos muy diferentes tales como un archivo, un
+socket, la entrada y salida estándar o un driver.
+
+
+
+
+siguiendo esta filosofía, es posible crear programas
+propios y utilizarlos junto a comandos del sistema
+operativo, ya que como se indicaba, la filosofía de UNIX
+hace que no se distinga entre un programa propio o uno
+incluido en el sistema operativo.
+Por contra, los comandos de UNIX también tienen
+limitaciones o simplemente la filosofía no encaja para
+determinados contextos. Por ejemplo, no es sencillo
+tratar con comandos UNIX que requieran múltiples
+entradas o salidas.
+
+UNIX es una buena base para comprender el
+procesamiento por lotes:
+• Tratamiento de los ficheros de entrada como
+inmutables, es decir, las operaciones a ejecutar
+sobre los ficheros se realizan sin modificar los
+mismos y dando el resultado por pantalla o en un
+nuevo fichero.
+• Facilidad para depurar la concatenación de varios
+comandos, simplemente descargando la salida por
+pantalla.
+• Escribir la salida de un paso del proceso a fichero, de
+tal manera que el siguiente paso pueda ejecutarse
+más tarde, sin necesidad de ejecutar de inicio a fin
+una concatenación de comandos.
+
+MapReduce se centra en leer
+y escribir en un sistema de ficheros distribuido.
+• Sistemas de ficheros distribuidos
+El sistema de ficheros distribuido creado
+por Google para trabajar con MapReduce se
+denomina Google File System (GFS) y Hadoop, la
+implementación bajo licencia Apache creado por
+Doug Cutting, tiene su correspondiente versión
+llamada Hadoop Distributed File System (HDFS).
+A diferencia de los sistemas de ficheros en red hasta
+la fecha, en lugar de tener un lugar centralizado
+compartido por diferentes máquinas, HDFS utiliza
+un enfoque donde las máquinas realmente no
+comparten un único sistema de almacenamiento,
+sino que solo es necesario conectar un conjunto de
+máquinas a una red en la que cada máquina pondrá
+su disco duro a disposición del sistema.
+
+Cada máquina utiliza un servicio que expone su
+unidad de almacenamiento para uso del resto y
+por el cual puede utilizar el almacenamiento de
+las otras máquinas. Hadoop contaba también con
+un servicio centralizado llamado NameNode que
+mantenía un listado de qué máquina tenía qué
+bloques de ficheros. A partir de su versión 2.0.0,
+se ofrecía la posibilidad de que fueran dos (a partir
+de la versión 3.0.0 más de dos) nodos redundantes
+NameNodes para prevenir que si este servicio no
+estuviera disponible todo el clúster HDFS dejara
+de estarlo. Así, este servicio crea un único sistema
+grande de ficheros que utiliza el espacio de todas
+las máquinas donde se ejecuta el servicio.
+
+MapReduce sigue siempre el siguiente patrón de
+procesamiento de datos:
+1. Lee los archivos de entrada y los divide en
+registros.
+2. Llama a la función “Map” para extraer una clave
+y valor para cada registro.
+3. Ordena todos los pares clave-valor por clave.
+4. Llama a la función “Reduce” para iterar sobre
+el conjunto de pares clave-valor. Si hay varias
+ocurrencias con la misma clave, estarán
+ordenadas de forma adyacente.
+
+• “Map”: esta función se llama una vez por cada
+registro, la función de “Map” es la de extraer la clave
+y el valor del registro. La extracción puede consistir
+en generar ninguna, una o más pares clave-valor
+por cada registro.
+• “Reduce”: una vez que se tienen todas los pares
+clave-valor se agrupan por clave y se llama a la
+función reduce que realizará una operación con la
+colección de valores.
+
+El flujo de datos de un trabajo se inicia con los archivos
+de datos en el sistema de archivos HDFS, el trabajo se
+paraleliza en base a su particionado y cada fichero o
+bloque de datos será procesado por una función “Map”.
+Cada mapper se ejecuta en cada máquina que tiene una
+réplica del archivo de entrada, de tal forma que no es
+necesario copiar el archivo de entrada a otras máquinas
+consiguiendo reducir la carga de red.
+
+En el caso de que la máquina cuente con el código que
+debe ejecutar (la función “Map”), comienza a leer el
+archivo pasando cada registro a la función. Si el código
+de la función no está disponible MapReduce copia el
+código a la máquina oportuna.
+El número de operaciones “reduce” a ejecutar es
+determinado por el diseñador del sistema. En este caso,
+MapReduce calcula un hash de cada clave para asignarle
+una máquina y así los pares clave-valor con la misma
+clave irán a la misma máquina.
+cada pareja clave-valor debe estar
+ordenada a la hora de aplicar la función “Reduce”, dado el
+tamaño del conjunto de datos no se utiliza un algoritmo
+convencional de ordenación. En cambio, cada mapper
+divide su resultado por reducer (en base al hash) y cada
+partición es escrita en un fichero de forma ordenada.
+
+Cuando el mapper termina de procesar el archivo de
+entrada y escribir la salida ordenada, MapReduce
+notifica a los reducers que pueden empezar a obtener
+los archivos. Los reducers se conectan a los mappers y
+descargan los archivos. El proceso de partir por reducer,
+ordenar y copiar se conoce como shuffle.
+
+Otra de las operaciones interesantes en el ecosistema
+MapReduce es la de uniones con ordenación. Cuando
+hay dos tipos de datos diferentes que comparten un
+identificador, la operación “Map” puede generar como
+salida la agrupación por clave y posterior ordenación
+de los pares clave-valor, consiguiendo que dos
+entradas de archivos diferentes terminen en un fichero
+como información adyacente. Posteriormente con
+la información agrupada, “Reduce” puede realizar su
+función de unión de una forma mucho más sencilla.
+
+Motoros de flujos de datos
+
+MÉTODOS HIVE O PIG
+
+El proceso de escribir los archivos intermedios a disco
+se denomina materialización y tiene las siguientes
+desventajas:
+• Un trabajo solo empieza cuando los trabajos
+precedentes se han completado, en lugar de
+empezar con la información disponible. El problema
+es que la espera en cada punto intermedio puede
+ralentizar de forma considerable la ejecución del
+flujo de trabajo.
+• En ocasiones, los mapeos son redundantes, ya que
+solo sirven para preparar la operación del reducer.
+En estos casos sería óptimo aplicar una operación
+a la salida del reducer.
+• Como se comentaba previamente, MapReduce
+añade tolerancia a fallos mediante la réplica de
+los datos en diferentes máquinas. Esta solución
+también se aplica a archivos intermedios llegando a
+ser una solución exagerada para datos temporales.
+
+En lo que respecta a la tolerancia a fallos, MapReduce
+tiene la ventaja de poder reiniciar una tarea en otra
+máquina, ya que todos los trabajos terminados
+almacenan su salida en el sistema de archivos. En el
+caso de los motores de flujo de datos, si una máquina
+falla y se pierde el estado intermedio, es necesario
+comenzar en un estado previo o incluso desde la
+entrada original. Dado que estos sistemas tienen
+un conjunto de operaciones más amplio, puede que
+utilicen operaciones no deterministas, provocando que
+los operadores subsecuentes modifiquen el estado
+del sistema. Esta diferencia hace que recomputar
+pueda conllevar a resultados contradictorios, por lo
+que la solución en la medida de lo posible es optar
+por operaciones deterministas. En algunas ocasiones,
+el reprocesamiento de los datos no es rentable, bien
+porque el procesamiento desde el punto donde hay que
+retomar el procesamiento consuma muchos recursos
+o porque el resultado del estado intermedio sea mucho
+más pequeño que el conjunto de datos de entrada. En
+estos casos, la materialización es una mejor opción.
+
+
+El modelo Pregel [2], [3] popularizó el procesamiento de grafos por lotes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	Tema 9:
+Procesamiento de datos en tiempo real.
+
+Para muchos sistemas, es que los datos no están limitados,
+sino que llegan de forma indefinida a lo largo del tiempo.
+
+procesar cada nuevo evento en cuanto ocurra. Esta es la idea del procesamiento de flujo de
+datos o stream processing.
+
+Tipos de brokers de mensajes:
+
+La unidad comun en el procesamiento de datos es el evento. Un evento puede
+codificarse en formatos legibles como JSON o en
+formatos binarios como Protocol Buffers, Avro o Thrift.
+
+Un conjunto de eventos con determinada relación se agrupan en un TEMA o TÓPICO.
+Adicionalmente, el evento es generado por un productor o publicador y proc.esado por uno o más consumidores o suscriptores.
+
+ Es el concepto de tema
+o tópico y la suscripción a este, el mecanismo que
+habilita varios consumidores para un evento. Además,
+dentro del modelo de publicadores/suscriptores existen
+diferentes enfoques que hacen que cada uno de ellos
+sea más adecuado en un contexto específico.
+
+Una de las diferencias marcadas entre los distintos
+enfoques es como gestionan que un productor envíe
+mensajes a un ritmo superior al de que los consumidores
+pueden procesarlos. En este aspecto hay tres posibles
+posturas: el sistema descarta mensajes, los almacena
+en una memoria intermedia o aplica una resistencia o
+contrapresión (este concepto se conoce en inglés como
+backpressure y consiste en bloquear o limitar el envío
+de más mensajes por parte del productor). En el caso
+de utilizar un búfer, es necesario saber cómo actúa el
+sistema cuando esa memoria se llena. Dado que, bien
+puede provocar el fallo del sistema o bien puede persistir
+los mensajes en disco. En este último caso es necesario
+tener en cuenta si esto afecta al rendimiento del sistema
+de mensajería.
+
+Por ello, una de las opciones para los sistemas
+de mensajería es conectar al productor con los
+consumidores y, dependiendo de la herramienta, estas
+estarán a su vez basadas en protocolos o modelos que
+aseguran o no la recepción de los mensajes. En otras
+palabras, algunos sistemas utilizan el protocolo UDP
+multicast para conseguir una latencia muy baja a costa
+de la perdida de paquetes, mientras otros utilizan TCP
+si quieren recibir una notificación de recepción del
+mensaje
+El mayor problema de este enfoque es que la tolerancia
+a fallos es muy reducida tanto si el consumidor está
+sin servicio o el productor falla, la perdida de mensajes
+debe asumirse, incluso si el sistema tiene algún
+mecanismo de retransmisión de mensajes. Por esta
+razón, la alternativa ampliamente utilizada para el envío
+de mensajes es mediante la utilización de un agente
+intermediario de mensajes (message broker o message
+queue). Este intermediario es básicamente una base de
+datos adaptada al uso que va a tener: los productores
+escribirán y los lectores leerán del bróker.
+
+Además, esta memoria intermedia transforma el
+sistema en uno asíncrono, ya que el productor no espera
+una respuesta del consumidor, sino que solo espera a
+que el bróker confirme que ha almacenado el mensaje.
+En suma, el consumidor puede procesar el mensaje de
+forma inmediata o mucho después. 
+
+No obstante, a pesar de que los sistemas de cola de
+mensajes persisten la información, esta es eliminada
+tan pronto los consumidores la procesan. Caso
+contrario, en los sistemas por lotes o las bases de datos
+en cambio, persiste la información y solo la eliminan
+en caso de que se solicite así expresamente. Como se
+puede observar, la diferencia entre estos sistemas es
+muy importante en lo referente a los datos generados,
+en breve, un sistema por lotes puede consumir y realizar
+diferentes operaciones sin riesgo de estropear los datos
+originales. Sin embargo, una cola de mensajes destruye
+la información tan pronto el consumidor la procesa,
+por lo que si el procesamiento es erróneo no es posible
+reprocesar (como sí lo es en el sistema por lotes)
+
+el deseo de un sistema con baja latencia y la
+durabilidad de una base de datos dieron lugar al bróker
+de mensajería basados en logs. Los logs han sido
+examinados en el tema de los motores de búsqueda
+y recuperación de datos mostrándolos como una
+secuencia de registros utilizados solo para concatenar
+contenido. A su vez, esta misma estructura es la utilizada
+en un bróker de mensajería. En tanto, en productor envía
+un mensaje al bróker, siendo este concatenado al final
+del fichero de log. El consumidor irá leyendo de forma
+secuencial el log y por lo tanto leyendo en orden de
+escritura los eventos
+
+Del mismo modo que las bases de datos distribuidas
+realizaban particiones pasando de albergar la
+información en una única máquina a varias con el
+objetivo de mejorar el rendimiento, los brókeres de
+mensajería también utilizan esta solución. En síntesis,
+un tópico es el conjunto de particiones que almacenan
+el mismo tipo de mensaje. Dentro de cada partición,
+el bróker asigna un número secuencial (offset) a cada
+mensaje. Este número sirve para hacer referencia a
+cada mensaje y utilizarlo como indicador para que cada
+consumidor sepa cuál es el último mensaje procesado.
+De esta manera, cada partición almacenará de forma
+ordenada los mensajes, pero esta garantía no se cumple
+entre particiones, es decir, no hay un orden global para
+todos los mensajes de un tópico sino solo para mensajes
+de una partición. Flujos de datos y bases de datos
+
+Una de las posibles soluciones es utilizar escrituras
+duales, es decir, que la aplicación realice con los datos
+que maneja escrituras a los sistemas que utiliza,
+sirva como ejemplo, un motor de búsqueda, una base
+de datos, una caché, etc. Sin embargo, esta solución
+presenta un problema importante: condición de carrera.
+En el contexto de actualizar dos o más sistemas,
+significa que una escritura en un instante T2 termina
+de actualizar los sistemas antes que una escritura T1
+que comenzó previamente y los valores que acaban
+en uno de esos sistemas son los que T1 termina de
+escribir, provocando que algunos sistemas acaben con
+los valores de la escritura T2 y otros con los valores de
+T1 y, por lo tanto, dejando a los sistemas en un estado
+inconsistente con el otro. 
+
+Este problema es especialmente importante porque es
+difícil de detectar. A menos que se tenga una solución
+compleja para la detección escrituras concurrentes, los
+sistemas serían inconsistentes sin manifestar ningún
+error en el procesamiento de la información. Por otro
+lado, las escrituras duales pueden dar a una situación
+en la que una de las dos escrituras se lleva a cabo
+con éxito mientras la otra falla, dejando en este caso,
+también dos sistemas inconsistentes. La solución para
+este caso pasa por asegurarse de que o bien ambas
+escrituras tienen éxito o ambas fallan.
+mantener diferentes sistemas
+sincronizados, el interés por capturar los cambios en una
+base de datos y transformarlos de tal manera que puedan
+ser replicados fácilmente ha crecido significativamente.
+Este proceso se conoce como Change Data Capture
+(CDC) y es de especial interés cuando ese formato nuevo
+utilizable para otros sistemas se presenta en forma de
+flujo de datos (eventos).
+
+En la práctica, la forma de llevar a cabo la captura de
+cambios de datos se basa en que una base de datos es
+marcada como líder y los sistemas derivados (aquellos
+sistemas que necesitan los mismos datos para una
+representación y explotación diferente) son marcados
+como seguidores. Entre estos sistemas, un gestor de
+mensajería basado en ficheros de log encaja muy bien
+para realizar la labor de llevar los cambios desde la base
+de datos a los sistemas derivados conservando el orden.
+
+Al igual que los sistemas de mensajería, el sistema de
+captura de cambios en los datos es asíncrono, es decir,
+el sistema registra los cambios, pero no espera a recibir
+ninguna señal de los sistemas derivados para marcarlo
+como procesado. Esta solución tiene como ventaja
+que un consumidor que tarde más tiempo en procesar
+el evento no ralentiza al sistema y, por contra, al haber
+diferentes ritmos de procesamiento hay un desfase
+entre los sistemas.
+En el caso de querer utilizar esta solución, si todos los
+cambios a la base de datos están registrados, bastaría
+con aplicar todos esos cambios. No obstante, tanto
+almacenar todos los cambios puede conllevar un
+consumo de espacio en disco demasiado grande, como
+también procesar todo el log un tiempo inadmisible. Por
+lo que los logs deben truncarse, es decir, mantener solo
+una porción de toda la información.
+
+Para algunos sistemas, el registro de los últimos cambios
+no es suficiente y se necesita una copia entera de la
+base de datos. En estos casos, es necesario comenzar
+a partir de un snapshot: se trata de una instantánea de
+la base de datos correspondiente con una posición de
+la cadena del archivo de cambios y a partir de la que
+aplicar el resto de los cambios del archivo. A su vez,
+una alternativa para inicializar un sistema secundario
+o derivado del sistema principal es mediante el uso de
+un archivo de log compactado. Este archivo se basa
+en buscar registros con la misma clave, dejando el
+más reciente y eliminando todos los restantes. De esta
+manera, si el sistema anterior que necesitaba una copia
+entera de la base de datos o un snapshot, podrá utilizar
+el log compactado porque contendrá solo los valores
+más recientes para cada clave
+
+En el caso de las
+herramientas de mensajería también hay soluciones
+que facilitan este proceso de sincronización, siendo
+Kafka Connect [4] una de las más conocidas.
+
+Uno de los usos extendidos del procesamiento de
+eventos es la monitorización, disparando alguna acción
+ante una situación concreta. Algo similar a un trigger
+de una base de datos con patrones más sofisticados.
+Asimismo, un enfoque para el análisis de flujos de datos
+en la búsqueda de ciertos patrones es Complex Event
+Processing (CEP), este sistema permite especificar
+reglas para buscar ciertos patrones en el flujo de
+eventos.
+
+Adicionalmente, estos sistemas permiten especificar
+los patrones a detectar bien sea con una interfaz gráfica
+o con un lenguaje específico, en algunos casos similar a
+SQL. En estos sistemas las consultas, a diferencia de las
+bases de datos, no son volátiles, sino que son duraderas
+en el tiempo. Puesto a que, el motor de procesamiento
+recibe como entrada los flujos de datos e intenta
+encontrar una coincidencia, cuando la encuentra, el
+motor emite un evento complejo con los detalles del
+patrón que hicieron detectar el evento.
+
+En este campo hay muchos sistemas en el mercado como
+Kafka Streams, Storm, Samza o soluciones en la nube
+de Google y Microsoft como Google Cloud Dataflow o
+Azure Stream Analytics.
+
+
+Change data Capture
+
+
+Tema 10
+Aplicaciones.
+
+Consistencia en lecturas.
+
+Twitter: catalogada como microblogging, Base de datos Manhattan
+Scalding -> procesamiento por lotes
+Heron -> procesamiento de en tiempo real.
+Arquitectura lambda : batch & streaming
+
+el caching, Twitter basa
+sus soluciones en Redis y en Memcache
+
+sistema de caché de Twitter es tal que permite servir
+más de 120 GB de datos por segundo.
+Su propia versión -> Twemcache 
+
+La forma de escalar horizontalmente la capa de caché
+minimizando el número de conexiones a los servidores
+es mediante un proxy ligero llamado Twemproxy 
+
+Twemcache nació para dar solución a las necesidades de adaptabilidad, disponibilidad y predictibilidad.
+
+Enfoque holístico de datos.
+
+Uber:
+tiene una de las implementaciones más exigentes sobre kafka
+
+Respecto a la gestión de eventos relacionados con
+un anuncio, el sistema de procesamiento tiene la
+responsabilidad de gestionar el flujo, extraer la
+información necesaria, agregar otra información como
+valoraciones o clics, asociarlos con compras y facilitar
+esta información de manera que los sistemas de
+analítica y de informes, así como otros clientes, puedan
+acceder a ella.
+
+Para esta necesidad, Uber diseñó su sistema utilizando
+tecnologías open source, concretamente Apache Flink,
+Apache Hive, Apache Pinot y Apache Kafka
+
+Pinot es un almacenamiento de tipo OLAP distribuido
+y escalable, permite consultas para el análisis de datos
+con muy baja latencia.
+
+Escalado de un sistema distribuido.
+
+FACEBOOK
+Facebook construyó los
+perfiles de usuario como un grafo con relaciones con
+amigos y familiares, además de grupos, “Me gusta”
+y mucha otra información. En aquel momento, la
+flexibilidad de SQL y la difusión de la solución open
+source MySQL motivó que se optara por ella para la
+demás, aquella primera
+versión hacía uso de una caché para intentar mejorar
+el rendimiento de las lecturas.
+
+La solución fue dividir los datos
+en particiones y registrar qué perfil de usuario está
+en qué instancia MySQL. Al día de hoy, y como se
+ha podido estudiar en un tema previo, esta idea es
+conocida como particionado o sharding y, aunque se
+asocian comúnmente a bases de datos no relacionales,
+Facebook fabricó su solución con un gestor relacional.
+Por supuesto, a pesar de utilizar una base de datos
+relacional, el cambio de paradigma hacía perder
+la potencia de SQL, ya que no se podían realizar
+operaciones JOIN que involucrasen varias particiones.
+
+gestión de la persistencia.
+
+Otro de los momentos claves en el crecimiento fue
+disponer de múltiples centros de datos distribuidos
+geográficamente con tolerancia a fallos. De hecho, la
+solución fue utilizar servidores MySQL como esclavos
+de datos, así como instancias de memcache. Sin
+embargo, ante un fallo y dado que la replicación es
+asíncrona, se podía dar el caso que información ya
+asegurada en unos centros no estuviera todavía en
+otros ante un fallo.
+Relacionado con el problema de la replicación, está la
+inconsistencia (tema que también fue objeto de estudio
+en este módulo) entre la caché y la base de datos debido
+a su replicación asíncrona, es decir, la caché no podía
+servir como lecturas inmediatamente después de la
+escritura de los datos escritos.
+La solución de Facebook en 2009 fue TAO [3], una API de
+grafos NoSQL construida encima de MySQL (figura 4).
+Los datos se representaban como nodos y las relaciones
+entre ellos como arcos. Para los desarrolladores fue un
+cambio significativo porque dejaron de pensar en si las
+actualizaciones o consultas tenían que ser realizadas en
+MySQL o memcache, sino que esta abstracción encajaba
+perfectamente con sus tareas cotidianas sin conocer el
+sistema de almacenamiento subyacente.
+
+
+
+
+
+hints: Hit ratio.

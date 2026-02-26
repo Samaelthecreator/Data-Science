@@ -40,5 +40,13 @@ Aplicaciones concretas de la IA.
 ## 📂 05_Etica_y_Regulacion
 Aspectos cruciales sobre el impacto, la ética y las leyes que rigen la IA.
 
+## 📂 06_Ingenieria_y_Arquitectura_de_Datos
+El puente entre los modelos teóricos y los sistemas en producción a escala global. Sistemas Distribuidos y Big Data.
+- **Almacenamiento e Índices:** Motores internos (SSTables, LSM-Trees, B-Trees).
+- **Formatos y Flujos:** Serialización y mensajería (JSON, Avro, Protobuf, REST, RPC).
+- **Sistemas Distribuidos:** Teorema CAP, PACELC, Replicación, Particionado y Transacciones Distribuidas.
+- **Procesamiento a Escala:** Batch (MapReduce, Hadoop) y Streaming en tiempo real (Kafka, CDC).
+- **Casos de Estudio:** Arquitecturas reales (Twitter, Uber, Facebook).
+
 ---
 *Este repositorio está vivo y en constante evolución.*
