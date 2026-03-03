@@ -130,3 +130,27 @@ Diles a tus alumnos: *"Un buen scrapper no es el que sabe usar Selenium, sino el
 La ingeniería de datos busca eficiencia: **¿Para qué renderizar toda una imagen de una casa si solo queremos el número que representa su precio en la base de datos?**
 
 **¿Te gustaría que ahora pasáramos a la fase de "Limpieza y Estructuración" en Pandas con los datos que ya logramos obtener del JSON?** Sería el cierre perfecto para tu bloque de Ingeniería.
+
+
+
+# Valores atípicos:
+
+Para eliminar valores atípicos (outliers) en Python, se utilizan principalmente las bibliotecas Pandas y NumPy mediante la técnica del Rango Intercuartílico (IQR) o Z-score. La forma más común es calcular los límites superior e inferior (Q1 - 1.5 * IQR y Q3 + 1.5 * IQR) y filtrar el DataFrame, eliminando filas que superen estos umbrales.
+
+
+```Python
+import pandas as pd
+import numpy as np
+
+# Supongamos que df es tu DataFrame y 'columna' la que tiene outliers
+Q1 = df['columna'].quantile(0.25)
+Q3 = df['columna'].quantile(0.75)
+IQR = Q3 - Q1
+
+# Definir límites
+limite_inferior = Q1 - 1.5 * IQR
+limite_superior = Q3 + 1.5 * IQR
+
+# Filtrar el DataFrame
+df_sin_outliers = df[(df['columna'] >= limite_inferior) & (df['columna'] <= limite_superior)]
+```
