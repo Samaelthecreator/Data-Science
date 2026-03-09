@@ -1,0 +1,182 @@
+# Prompting
+
+Hint: *Claridad*
+
+##Métodos:
+ 
+### Zero Shot prompting
+
+### One Shot Prompting
+
+### Few Shot Learning
+
+### Tree of Thoughts
+
+### Role prompting
+
+### System prompt
+
+### Prompt injection
+
+### Prompt leaking:
+
+### Jalibreaking
+
+### Delimitadores
+
+### Razonamiento paso a paso (Chain of Thougth).
+
+
+## Estructuración de prompts
+El tener claridad y orden en la información proporciona mayor posibilidad de una respuesta precisa:
+
+- OpenAI: sugiere usar markdown para marcar secciones distintas y comunicar jerarquia, y etiquetas XML para delimitar contenido. [1]
+
+- Claude: Aconseja definir estructuras de salida deseada y proporcionar una estructura clara para el análisis. [1]
+
+- Google Gemini: recomiendoa diseñar con simplicidad y ser especifico sobre la salida deseada. [1]
+
+
+### Uso de roles y contexto.
+Asignación de roles y la inclusión de contexto.
+
+- OpenAI: describe el uso de roles de mensajes (developer,  user, assistant) con diferentes niveles de autoridad.
+
+- Claude: recomienda usar juego de roles pidiendo a Claude que adpote un rol o perspectiva especifica al responder.
+
+- Google Gemini: *system contextual & role prompting*; técnicas para definir el comportamiento del modelo y proporcionar contexto adicional.
+
+
+### Iteracción y refinamiento
+
+- OpenAI: describe el prompt engineering como un proceso iterativo y recomienda auditar fallos.
+
+- Claude: sugiere el refinamiento iteractivo, pidiendo clarificaciones o modificaciones si la primera respuesta no es adecuada.
+
+- Google Gemini: menciona que el "prompt engineer es un proceso iterativo" y recomienda *documentar* los diversos intentos de promtp.
+
+
+# Parámetros comunes
+
+- Temperatura: Controla la aleatoriedad en la sección de tokens (rango: [0,1])
+
+- Top k: Limita la selección a los K tokens más probables (Valores típicos: 1-100)
+Para k bajo: respuestas más conservadoras y factuales, K alto: mayor diversidad y creatividad.
+
+- /Top P (Nucleus sampling): selecciona tokens cuya probabilidad acumulada no exceda un valor P (Rango [0-1]).
+Valores bajos: mas conservador , valores altos: más diversidad 
+
+- Longitud máxima: Limita el número de tokens en la respuesta: Importante para controlar *costos y tiempos de respuesta*
+
+- Penalización por repetición
+
+- Presencia
+
+- Frecuencia
+
+HINTS:
+
+- Tareas factuales (respuestas precisas):
+    - Temperatura: [0.0,0.2]
+    - Top K: [0,1]
+    - Top P: [0.1,0.5]
+
+- Redacción de contenido equilibrado:
+    - Temperatura: [0.3,0.7]
+    - Top K: [40+]
+    - Top P: [0.7,0.9]
+
+- Generación de código:
+    - Temperatura:[0.3,0.7]
+    - Top K: [20,40]
+    - Top P: [,0.5,0.7]
+
+
+### Alucinaciones
+
+Solucuones:
+- Solicitar al modelo que verifique la información.
+- Pedir que indique su nivel de confianza
+- Solicitar citas o fuentes
+- Reducir la temperatura
+
+
+# Mejores prácticas:
+
+## Documentación de prompts.
+Mantener un registro de prompts efectivos facilita la reutilización y mejor acontinua.
+    - Crear una biblioteca de prompts para diferentes casos de uso
+    - Documentar la estructura y componentes clave de cada prompt
+    - registrar los resultado obtenidos y posibles mejoras
+    - versionar los prompts para seguir su evolución
+
+# Pruebas y evaluación:
+-   Probar el mismo prompt con diferentes parámetros
+- Evaluar resultados con criterios objetivos
+- realizar *pruebas A/B¨* entre diferentes versiones
+- solicitar reotroalimentación de ususarios finales
+
+## Términos:
+
+- LLM:
+- Fine Tuning
+- Inferencia
+- Embedding
+- Token
+- Contexto
+- Multimodal
+- RAG
+ 
+# Modelos de lenguaje grande (LLM)
+
+
+## OpenAI:
+
+-   GPT -5.4:
+
+
+#Herramientas y plataformas:
+
+- Caption
+
+## Agentes importantes en el desarrollo de la IA:
+
+-   Emad Mostaque 
+
+# Benchmarks
+
+## Capacidades cognitivas (qué y cómo):
+    - MMLU-Pro (Conocimiento masivo): Es la evolución del clásico MMLU. Mied si el modelo realmente entiende el concepto o si está simplemente adivinando por descarte probabilístico.
+
+    - GPQA (Graduate-Level Google-Proof Q&A): Es el estandar de oro para ciencia avanzada (biología, física, química). Son preguntas escritas por expertos de nivel doctorado que son extremadamente dificiles de encontrar en buscadores. Los modelos de frontera (Gemini 3.1, Claude 4.5). estan alcanzando el 90-95%
+    - ARC- AGI-2 (Razonamiento abstracto): No mide que sabe el modelo, si no su capacidad para aprender un concepto nuevo sobre la marca y aplicarlo Hasta hace poco los LLMs fallaban estrepitosamente aquí; en 2026, los sistemas con "Thinking Mode" (razonamiento extendido) son los primeros en acercarse al nivel humano (~77%)
+
+    - HellaSwag: Prueba el sentido comun, Al modelo se le da ubna oración y debe elegir el final más plausible entre varias opciones
+## Evaluación de codificación y acción (agentes):
+
+- SWE-bench (Software Engineering Benchmark): Evalúa si el modelo puede resolver issues reales de GitHub. El modelo recibe un repositorio entero y debe encontrar el error, escribir el parche y pasar los tests. Es la métrica definitiva para medir la utilidad de un LLM en ingeniería de software.
+
+- GAIA (General AI Assistants): Mide tareas que requieren herramientas (navegar por la web, usar una calculadora, leer un PDF). Evalúa la planificación de pasos múltiples, donde un error en el paso 1 arruina todo el resultado.
+
+
+## Métricas técnicas y probabilísticas:
+
+Como experto en datos, estas métricas de "bajo nivel" te interesarán para comparar la eficiencia del entrenamiento.
+
+- Perplejidad (Perplexity): Mide qué tan "sorprendido" está el modelo ante un nuevo texto. Una perplejidad baja indica que el modelo ha capturado bien la distribución estadística del lenguaje.
+
+- Needle In A Haystack (La aguja en el pajar): Evalúa la fidelidad del contexto. Se inserta un dato aleatorio en medio de 1 millón de tokens y se le pide al modelo recuperarlo. Si el modelo tiene "pérdida de atención" en el medio de la ventana de contexto, fallará esta métrica.
+
+- Inference-Time Compute Efficiency: En 2026 se mide cuánta energía y tiempo gasta el modelo en su "fase de pensamiento" interna antes de dar la respuesta final.
+
+
+
+Evaluadores para test de no contaminación: https://livebench.ai/#/?highunseenbias=true
+
+
+ # Bibliografias:
+
+ - https://dhmsezey.manus.space/
+
+
+ HINTS POR DONDE IR: System Cards, Model Cards, Leaderboards
