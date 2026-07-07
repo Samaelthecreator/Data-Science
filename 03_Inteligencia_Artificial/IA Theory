@@ -180,3 +180,34 @@ Evaluadores para test de no contaminación: https://livebench.ai/#/?highunseenbi
 
 
  HINTS POR DONDE IR: System Cards, Model Cards, Leaderboards
+
+
+ ## Necesidades sobre el conocimiento de la IA y los LLMS comerciales
+
+Glosario técnico indispoensable:
+Token, benchmark, alucionacion, ventana de contexto, top n, top k, temperatura
+
+
+ ### ¿Sobre como se construye un LLM?
+ 
+
+ - ¿Que es un LLM?, ¿a partir de que se construyeron los LLM actuales? ¿Como funcionan?
+
+ - ¿Que formas existen para interactuar con ellos? (interfaz web, API, etc)
+
+ - Caracteristicas de los LLM comerciales:
+    - Sobre su entrenamiento
+    - Sobre sus parámetros de configuración
+    - Sobre sus modalidades (modo thinking, fast)
+    - Sobre su multimodalidad y que entradas y salidas permite
+ - Scores en los benchmarks
+
+ - Modelos comerciales mas importantes, versiones lanzadas y diferencias entre ellas.
+
+ - Modelos web y modelos de escritorio
+
+ - ¿Que es un agente y que características tiene?
+
+ - Metodologia de trabajo sobre agentes y su orquestamiento
+
+ - Vibecoding y especialistas.
